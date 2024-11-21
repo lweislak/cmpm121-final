@@ -2,8 +2,8 @@
 
 Introducing the Team
 --------------------------------------------
-Tools Lead: Victoria Morgan
-Engine Lead: Lo Weislak
+Tools Lead: Victoria Morgan,
+Engine Lead: Lo Weislak,
 Design Lead: Victoria Morgan
 
 Tools and Materials
