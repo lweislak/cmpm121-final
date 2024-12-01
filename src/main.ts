@@ -1,11 +1,12 @@
 import "./style.css";
 
 const PADDING = 0;
-const CANVAS_WIDTH = 800;
-const CANVAS_HEIGHT = 800;
+const CANVAS_WIDTH = 400;
+const CANVAS_HEIGHT = 400;
 const DRAW_PLAYER_OFFSET_X = 5;
 const DRAW_PLAYER_OFFSET_Y = 30;
 const BOX_SIZE = 40;
+
 
 const APP_NAME = "Farming Game";
 const app = document.querySelector<HTMLDivElement>("#app")!;
@@ -33,8 +34,6 @@ interface Cell {
   plantType: string | null;
   plantLevel: number | null;
 }
-
-const grid: number[] = []; //TODO: Store sun/water levels and plant info as object in array
 const player: Player = {
   icon: "👩‍🌾",
   x: 0,
@@ -68,14 +67,28 @@ function displayPlayer() {
 
 //Check which key was pressed
 function checkKeys(key: string) {
-  //Note: 20 is the number of cells in the 2D array
+  //Note: 10 is the number of cells in the 2D array
   if(key == "ArrowUp" && player.y > 0) { player.y--; }
-  else if(key == "ArrowDown" && player.y < 19) { player.y++; }
+  else if(key == "ArrowDown" && player.y < 9) { player.y++; }
   else if(key == "ArrowLeft" && player.x > 0) { player.x--; }
-  else if(key == "ArrowRight" && player.x < 19) { player.x++; }
-  //else if(key == "KeyE") {  }
+  else if(key == "ArrowRight" && player.x < 9) { player.x++; }
+  else if(key == "KeyE") { checkSurroundingCells(); }
+}
+
+function checkSurroundingCells() { //Cardinal directions only
+  console.log(grid[player.x][player.y]);
+}
+
+/*
+function sow() {
 
 }
+
+function reap() {
+
+}
+*/
+
 addEventListener("keydown", (e) => {
   const key = e.code;
   checkKeys(key);
@@ -85,3 +98,18 @@ addEventListener("keydown", (e) => {
 
 drawGrid();
 displayPlayer();
+
+//Populate grid with cells
+const grid: Cell[][] = [];
+for(let i = 0; i < CANVAS_HEIGHT/BOX_SIZE; i++) {
+  grid[i] = [];
+  for(let j = 0; j < CANVAS_WIDTH /BOX_SIZE; j++) {
+    const cell: Cell = {
+      sunLevel: Math.round(Math.random() * 5),
+      waterLevel: Math.round(Math.random() * 5),
+      plantType: null,
+      plantLevel: null,
+    }
+    grid[i][j] = cell;
+  }
+}
