@@ -31,7 +31,7 @@ interface Player {
 interface Cell {
   sunLevel: number;
   waterLevel: number;
-  plantType: string | null;
+  plantIcon: string | null;
   plantLevel: number | null;
 }
 const player: Player = {
@@ -39,6 +39,8 @@ const player: Player = {
   x: 0,
   y: 0,
 };
+
+const grid: Cell[][] = [];
 
 //Code found at: https://stackoverflow.com/a/11736122
 //Draws a grid on the canvas
@@ -49,20 +51,38 @@ function drawGrid(){
       ctx.lineTo(0.5 + x, CANVAS_HEIGHT);
   }
 
-  for (let x = 0; x <= CANVAS_HEIGHT; x += BOX_SIZE) {
-      ctx.moveTo(PADDING, 0.5 + x);
-      ctx.lineTo(CANVAS_WIDTH, 0.5 + x);
+  for (let y = 0; y <= CANVAS_HEIGHT; y += BOX_SIZE) {
+      ctx.moveTo(PADDING, 0.5 + y);
+      ctx.lineTo(CANVAS_WIDTH, 0.5 + y);
   }
+
   ctx.strokeStyle = "black";
   ctx.stroke();
+
+  for(let i = 0; i < CANVAS_HEIGHT/BOX_SIZE; i++) {
+    for(let j = 0; j < CANVAS_WIDTH/BOX_SIZE; j ++) {
+      displayPlant(grid[i][j], i, j);
+    }
+  }
 }
 
 //Displays player on the grid
 function displayPlayer() {
   ctx.font = "24px sans-serif";
-  const x = (player.x * BOX_SIZE)+ DRAW_PLAYER_OFFSET_X;
-  const y = (player.y * BOX_SIZE)+ DRAW_PLAYER_OFFSET_Y;
+  const x = (player.x * BOX_SIZE) + DRAW_PLAYER_OFFSET_X;
+  const y = (player.y * BOX_SIZE) + DRAW_PLAYER_OFFSET_Y;
   ctx.fillText(player.icon, x, y);
+}
+
+//Displays plants on the grid
+//TODO: Simplify displayPlayer() and displayPlant() into one function, displayIcon()
+function displayPlant(cell: Cell, x: number, y: number) {
+  if(cell.plantIcon != null) {
+    ctx.font = "24px sans-serif";
+    x = (x * BOX_SIZE) + DRAW_PLAYER_OFFSET_X;
+    y = (y * BOX_SIZE) + DRAW_PLAYER_OFFSET_Y;
+    ctx.fillText(cell.plantIcon, x , y);
+  }
 }
 
 //Check which key was pressed
@@ -72,22 +92,37 @@ function checkKeys(key: string) {
   else if(key == "ArrowDown" && player.y < 9) { player.y++; }
   else if(key == "ArrowLeft" && player.x > 0) { player.x--; }
   else if(key == "ArrowRight" && player.x < 9) { player.x++; }
-  else if(key == "KeyE") { checkSurroundingCells(); }
+  else if(key == "KeyE") { sow(); }
 }
 
-function checkSurroundingCells() { //Cardinal directions only
-  console.log(grid[player.x][player.y]);
+function sow() {
+  const cell = grid[player.x][player.y];
+  if(!cell.plantLevel) {
+    cell.plantLevel = 1;
+    cell.plantIcon = "🌱";
+    displayPlant(cell, player.x, player.y);
+  }
 }
 
 /*
-function sow() {
-
-}
-
 function reap() {
 
 }
 */
+
+//Populate grid with cells
+for(let i = 0; i < CANVAS_HEIGHT/BOX_SIZE; i++) {
+  grid[i] = [];
+  for(let j = 0; j < CANVAS_WIDTH /BOX_SIZE; j++) {
+    const cell: Cell = {
+      sunLevel: Math.round(Math.random() * 5),
+      waterLevel: Math.round(Math.random() * 5),
+      plantIcon: null,
+      plantLevel: null,
+    }
+    grid[i][j] = cell;
+  }
+}
 
 addEventListener("keydown", (e) => {
   const key = e.code;
@@ -98,18 +133,3 @@ addEventListener("keydown", (e) => {
 
 drawGrid();
 displayPlayer();
-
-//Populate grid with cells
-const grid: Cell[][] = [];
-for(let i = 0; i < CANVAS_HEIGHT/BOX_SIZE; i++) {
-  grid[i] = [];
-  for(let j = 0; j < CANVAS_WIDTH /BOX_SIZE; j++) {
-    const cell: Cell = {
-      sunLevel: Math.round(Math.random() * 5),
-      waterLevel: Math.round(Math.random() * 5),
-      plantType: null,
-      plantLevel: null,
-    }
-    grid[i][j] = cell;
-  }
-}
