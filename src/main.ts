@@ -35,24 +35,27 @@ interface Cell {
 }
 
 const grid: number[] = []; //TODO: Store sun/water levels and plant info as object in array
-const player = {icon: "👩‍🌾", x: 0, y: 0};
-
-
+const player: Player = {
+  icon: "👩‍🌾",
+  x: 0,
+  y: 0,
+};
 
 //Code found at: https://stackoverflow.com/a/11736122
 //Draws a grid on the canvas
 function drawGrid(){
-    for (let x = 0; x <= CANVAS_WIDTH; x += BOX_SIZE) {
-        ctx.moveTo(0.5 + x, PADDING);
-        ctx.lineTo(0.5 + x, CANVAS_HEIGHT);
-    }
+  ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+  for (let x = 0; x <= CANVAS_WIDTH; x += BOX_SIZE) {
+      ctx.moveTo(0.5 + x, PADDING);
+      ctx.lineTo(0.5 + x, CANVAS_HEIGHT);
+  }
 
-    for (let x = 0; x <= CANVAS_HEIGHT; x += BOX_SIZE) {
-        ctx.moveTo(PADDING, 0.5 + x);
-        ctx.lineTo(CANVAS_WIDTH, 0.5 + x);
-    }
-    ctx.strokeStyle = "black";
-    ctx.stroke();
+  for (let x = 0; x <= CANVAS_HEIGHT; x += BOX_SIZE) {
+      ctx.moveTo(PADDING, 0.5 + x);
+      ctx.lineTo(CANVAS_WIDTH, 0.5 + x);
+  }
+  ctx.strokeStyle = "black";
+  ctx.stroke();
 }
 
 //Displays player on the grid
@@ -62,6 +65,23 @@ function displayPlayer() {
   const y = (player.y * BOX_SIZE)+ DRAW_PLAYER_OFFSET_Y;
   ctx.fillText(player.icon, x, y);
 }
+
+//Check which key was pressed
+function checkKeys(key: string) {
+  //Note: 20 is the number of cells in the 2D array
+  if(key == "ArrowUp" && player.y > 0) { player.y--; }
+  else if(key == "ArrowDown" && player.y < 19) { player.y++; }
+  else if(key == "ArrowLeft" && player.x > 0) { player.x--; }
+  else if(key == "ArrowRight" && player.x < 19) { player.x++; }
+  //else if(key == "KeyE") {  }
+
+}
+addEventListener("keydown", (e) => {
+  const key = e.code;
+  checkKeys(key);
+  drawGrid();
+  displayPlayer();
+});
 
 drawGrid();
 displayPlayer();
