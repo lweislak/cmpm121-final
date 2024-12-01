@@ -10,6 +10,7 @@ const Plant = {
   y: 0,
   type: "sunflower",
   growthLevel: 0,
+  waterLevel: 0,
   grow: () => {
     Plant.growthLevel++;
     //Update image for plant

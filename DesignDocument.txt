@@ -1,0 +1,50 @@
+Player moves in the four cardinal directions: WASD or arrow movement
+
+Player can reap plants to remove them from the board, or sow one of
+the three different types.
+
+Player must be next to plants to reap or sow
+(including diagonal movement, perhaps? Or just right in front of them?)
+
+Every X steps, time moves forward. When time moves forward, sun tiles
+and water tiles are randomly generated. Sun and Water are provided
+to plants on those tiles.
+
+Sun is temporary for the turn, water is added to a water value.
+Water decreases when time moves forward.
+
+(Possible cloud mechanic, lower sun but higher water? Creeps about
+the board slowly, letting the player plant water-loving plants ahead
+of them and sun-loving plants behind them)
+
+Plants die when conditions are not right, and must be sowed.
+They must be harvested when ripe to win the game.
+
+Three types of plants: Wheat, Beans, and Potatoes
+
+Wheat grows well with lots of sun, and next to wheat and potatoes.
+
+Beans grow well with lots of water, and next to wheat.
+
+Potatoes grow well with lots of water, and next to beans.
+
+Effectiveness of other plants is increased at higher growth levels
+E.g. Beans grow better next to wheat with a higher growth level than
+a newly planted one (multiply by growth level?)
+
+Arranging these three plants next to each other is successful to grow them
+
+When time progresses and there are enough spare resources, plant grows
+to the next level
+
+Plants at level three give ingredients when reaped
+Filling all three quotas (wheat, beans, potatoes) wins the game
+
+If plants don't have enough resources, they wither.
+Withered plants reduce the growth of plants around them.
+(/actively hampers them by removing resources until they also die)
+This causes a cascade event if all the plants are too close together
+
+Ingredient levels don't decay over time, so losing entire garden does not
+remove progress forward (but withered plants must be cleared before new
+plants may be planted)
