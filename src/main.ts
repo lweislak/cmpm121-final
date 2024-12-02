@@ -111,6 +111,7 @@ function checkKeys(key: string) {
   else if(key == "KeyE") {
     const cell = grid[player.x][player.y];
     if(!cell.plantLevel) {sow(cell); }
+    else if(cell.plantLevel == 3) { reap(cell); }
     else { water(cell); }
   }
   else { return; }
@@ -133,7 +134,7 @@ function checkTurn() {
   }
 }
 
-function killPlant(cell: Cell) { //Could switch to wither instead
+function killPlant(cell: Cell) {
   cell.plantIcon = null;
   cell.plantLevel = 0;
   cell.waterLevel = 0;
@@ -149,11 +150,12 @@ function water(cell: Cell) {
   cell.waterLevel++;
 }
 
-/*
-function reap() {
 
+function reap(cell: Cell) {
+  killPlant(cell);
+  //TODO: Add plant to inventory
 }
-*/
+
 
 //Populate grid with cells
 for(let i = 0; i < CANVAS_HEIGHT/BOX_SIZE; i++) {
