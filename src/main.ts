@@ -15,6 +15,9 @@ document.title = APP_NAME;
 const gridDiv = document.createElement("div");
 app.append(gridDiv);
 
+const buttonDiv = document.createElement("div");
+app.append(buttonDiv);
+
 //Create canvas
 const canvas: HTMLCanvasElement = document.createElement("canvas");
 const ctx: CanvasRenderingContext2D = canvas.getContext("2d")!;
@@ -22,10 +25,19 @@ canvas.height = CANVAS_HEIGHT;
 canvas.width = CANVAS_WIDTH;
 gridDiv.append(canvas);
 
+//Create buttons for different seeds
+const seedTypes = [
+  {"icon": "🥔", "button": null as HTMLButtonElement | null},
+  {"icon": "🥕", "button": null as HTMLButtonElement | null},
+  {"icon": "🌽", "button": null as HTMLButtonElement | null}
+]
+
+
 interface Player {
   icon: string;
   x: number;
   y: number;
+  currentSeed: string;
 }
 
 interface Cell {
@@ -33,11 +45,14 @@ interface Cell {
   waterLevel: number;
   plantIcon: string | null;
   plantLevel: number | null;
+  plantType: string | null;
 }
+
 const player: Player = {
   icon: "👩‍🌾",
   x: 0,
   y: 0,
+  currentSeed: "🥔", //Default
 };
 
 const grid: Cell[][] = [];
@@ -100,8 +115,10 @@ function sow() {
   if(!cell.plantLevel) {
     cell.plantLevel = 1;
     cell.plantIcon = "🌱";
+    cell.plantType = player.currentSeed;
     displayPlant(cell, player.x, player.y);
   }
+  console.log(cell);
 }
 
 /*
@@ -109,6 +126,21 @@ function reap() {
 
 }
 */
+
+//Setup seed buttons
+function setButtons() {
+  for(let i = 0; i < seedTypes.length; i++) {
+    if(!seedTypes[i].button) {
+      seedTypes[i].button = document.createElement("button");
+      seedTypes[i].button!.innerText = seedTypes[i].icon;
+      buttonDiv.append(seedTypes[i].button!);
+    }
+    seedTypes[i].button!.addEventListener("click", function() {
+      player.currentSeed = seedTypes[i].icon;
+    });
+  }
+}
+
 
 //Populate grid with cells
 for(let i = 0; i < CANVAS_HEIGHT/BOX_SIZE; i++) {
@@ -119,6 +151,7 @@ for(let i = 0; i < CANVAS_HEIGHT/BOX_SIZE; i++) {
       waterLevel: Math.round(Math.random() * 5),
       plantIcon: null,
       plantLevel: null,
+      plantType: null,
     }
     grid[i][j] = cell;
   }
@@ -133,3 +166,4 @@ addEventListener("keydown", (e) => {
 
 drawGrid();
 displayPlayer();
+setButtons();
