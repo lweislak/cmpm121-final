@@ -6,9 +6,10 @@ const CANVAS_HEIGHT = 400;
 const DRAW_OFFSET_X = 10;
 const DRAW_OFFSET_Y = 35;
 const BOX_SIZE = 50;
+const TURN = 10;
+const MAX_PLANT_LEVEL = 3;
 
 let TIME = 0;
-const TURN = 10;
 
 
 const APP_NAME = "Farming Game";
@@ -17,6 +18,9 @@ document.title = APP_NAME;
 
 const gridDiv = document.createElement("div");
 app.append(gridDiv);
+
+const inventoryDiv = document.createElement("div");
+app.append(inventoryDiv);
 
 //Create canvas
 const canvas: HTMLCanvasElement = document.createElement("canvas");
@@ -29,7 +33,6 @@ interface Player {
   icon: string;
   x: number;
   y: number;
-  //currentSeed: string;
 }
 
 interface Cell {
@@ -39,7 +42,13 @@ interface Cell {
   plantLevel: number | null;
 }
 
-//interface Inventory {}
+//Create player inventory
+const inventory = [
+  {"icon": "🥔", "amount": 0 as number},
+  {"icon": "🥕", "amount": 0 as number},
+  {"icon": "🌽", "amount": 0 as number}
+]
+
 
 const player: Player = {
   icon: "👩‍🌾",
@@ -111,7 +120,7 @@ function checkKeys(key: string) {
   else if(key == "KeyE") {
     const cell = grid[player.x][player.y];
     if(!cell.plantLevel) {sow(cell); }
-    else if(cell.plantLevel == 3) { reap(cell); }
+    else if(cell.plantLevel == MAX_PLANT_LEVEL) { reap(cell); }
     else { water(cell); }
   }
   else { return; }
@@ -150,10 +159,21 @@ function water(cell: Cell) {
   cell.waterLevel++;
 }
 
-
 function reap(cell: Cell) {
+  for(const obj of inventory) {
+    if(obj.icon == cell.plantIcon) {
+      obj.amount++;
+      updateInventory();
+    }
+  }
   killPlant(cell);
-  //TODO: Add plant to inventory
+}
+
+function updateInventory() {
+  for(let i = 0; i < inventory.length; i++) {
+    const newNode = document.createTextNode(`${inventory[i].icon!}: ${inventory[i].amount.toString()}\n`);
+    inventoryDiv.replaceChild(newNode, inventoryDiv.childNodes[i]);
+  }
 }
 
 
@@ -169,6 +189,13 @@ for(let i = 0; i < CANVAS_HEIGHT/BOX_SIZE; i++) {
     }
     grid[i][j] = cell;
   }
+}
+
+//Display inventory
+for(let i = 0; i < inventory.length; i++) {
+  const txt = document.createTextNode(`${inventory[i].icon!}: ${inventory[i].amount.toString()}\n`);
+  inventoryDiv.appendChild(txt);
+  //inventoryDiv.append(document.createElement('br'));
 }
 
 addEventListener("keydown", (e) => {
