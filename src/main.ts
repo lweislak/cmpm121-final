@@ -52,7 +52,7 @@ const player: Player = {
   icon: "👩‍🌾",
   x: 0,
   y: 0,
-  currentSeed: "potato", //Default
+  currentSeed: "🥔", //Default
 };
 
 const grid: Cell[][] = [];
@@ -118,6 +118,7 @@ function sow() {
     cell.plantType = player.currentSeed;
     displayPlant(cell, player.x, player.y);
   }
+  console.log(cell);
 }
 
 /*
