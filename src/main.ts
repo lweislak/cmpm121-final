@@ -3,9 +3,9 @@ import "./style.css";
 const PADDING = 0;
 const CANVAS_WIDTH = 400;
 const CANVAS_HEIGHT = 400;
-const DRAW_PLAYER_OFFSET_X = 5;
-const DRAW_PLAYER_OFFSET_Y = 30;
-const BOX_SIZE = 40;
+const DRAW_PLAYER_OFFSET_X = 10;
+const DRAW_PLAYER_OFFSET_Y = 35;
+const BOX_SIZE = 50;
 
 
 const APP_NAME = "Farming Game";
@@ -89,9 +89,9 @@ function displayPlant(cell: Cell, x: number, y: number) {
 function checkKeys(key: string) {
   //Note: 10 is the number of cells in the 2D array
   if(key == "ArrowUp" && player.y > 0) { player.y--; }
-  else if(key == "ArrowDown" && player.y < 9) { player.y++; }
+  else if(key == "ArrowDown" && player.y < 7) { player.y++; }
   else if(key == "ArrowLeft" && player.x > 0) { player.x--; }
-  else if(key == "ArrowRight" && player.x < 9) { player.x++; }
+  else if(key == "ArrowRight" && player.x < 7) { player.x++; }
   else if(key == "KeyE") { sow(); }
 }
 
