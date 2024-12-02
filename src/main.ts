@@ -108,7 +108,11 @@ function checkKeys(key: string) {
   else if(key == "ArrowDown" && player.y < 7) { player.y++; }
   else if(key == "ArrowLeft" && player.x > 0) { player.x--; }
   else if(key == "ArrowRight" && player.x < 7) { player.x++; }
-  else if(key == "KeyE") { sow(); }
+  else if(key == "KeyE") {
+    const cell = grid[player.x][player.y];
+    if(!cell.plantLevel) {sow(cell); }
+    else { water(cell); }
+  }
   else { return; }
   TIME++;
   checkTurn();
@@ -118,9 +122,9 @@ function checkTurn() {
   if (TIME % TURN == 0) {
     for(let i = 0; i < CANVAS_HEIGHT/BOX_SIZE; i++) {
       for(let j = 0; j < CANVAS_WIDTH /BOX_SIZE; j++) {
+        grid[i][j].waterLevel -= grid[i][j].sunLevel; //Sun level decreases water level each turn
         grid[i][j].waterLevel += Math.round(Math.random() * 3);
         grid[i][j].sunLevel = Math.round(Math.random() * 5);
-        grid[i][j].waterLevel -= grid[i][j].sunLevel; //Sun level decreases water level each turn
         if(grid[i][j].waterLevel <= 0) { //If water level gets too low, plant dies
           killPlant(grid[i][j]);
         }
@@ -135,21 +139,17 @@ function killPlant(cell: Cell) { //Could switch to wither instead
   cell.waterLevel = 0;
 }
 
-function sow() {
-  const cell = grid[player.x][player.y];
-  if(!cell.plantLevel) {
-    cell.plantLevel = 1;
-    cell.plantIcon = "🌱";
-    displayPlant(cell, player.x, player.y);
-  }
-  console.log(cell);
+function sow(cell: Cell) {
+  cell.plantLevel = 1;
+  cell.plantIcon = "🌱";
+  displayPlant(cell, player.x, player.y);
+}
+
+function water(cell: Cell) {
+  cell.waterLevel++;
 }
 
 /*
-function water() {
-
-}
-
 function reap() {
 
 }
