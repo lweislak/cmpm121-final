@@ -103,7 +103,6 @@ function displayPlayer() {
 }
 
 //Displays plants on the grid
-//TODO: Simplify displayPlayer() and displayPlant() into one function, displayIcon()
 function displayPlant(cell: Cell, x: number, y: number) {
   if(cell.plantIcon != null) {
     ctx.font = "35px sans-serif";
@@ -198,7 +197,7 @@ function reap(cell: Cell) {
 
 function checkWin(): boolean {
   for(const element of inventory) {
-    if(element.amount < 5) {  console.log("RETURN FALSE"); return false;}
+    if(element.amount < 5) { return false;}
   }
   return true;
 }
@@ -212,14 +211,14 @@ function updateInventory() {
 
 //Setup seed buttons
 function setButtons() {
-  for(let i = 0; i < seedTypes.length; i++) {
-    if(!seedTypes[i].button) {
-      seedTypes[i].button = document.createElement("button");
-      seedTypes[i].button!.innerText = seedTypes[i].icon;
-      buttonDiv.append(seedTypes[i].button!);
+  for(const seed of seedTypes) {
+    if(!seed.button) {
+      seed.button = document.createElement("button");
+      seed.button.innerText = seed.icon;
+      buttonDiv.append(seed.button!);
     }
-    seedTypes[i].button!.addEventListener("click", function() {
-      player.currentSeed = seedTypes[i].icon;
+    seed.button!.addEventListener("click", function() {
+      player.currentSeed = seed.icon;
     });
   }
 }
@@ -241,8 +240,8 @@ for(let i = 0; i < CANVAS_HEIGHT/BOX_SIZE; i++) {
 }
 
 //Display inventory
-for(let i = 0; i < inventory.length; i++) {
-  const txt = document.createTextNode(`${inventory[i].icon!}: ${inventory[i].amount.toString()}\n`);
+for(const element of inventory) {
+  const txt = document.createTextNode(`${element.icon!}: ${element.amount.toString()}\n`);
   inventoryDiv.appendChild(txt);
   //inventoryDiv.append(document.createElement('br'));
 }
