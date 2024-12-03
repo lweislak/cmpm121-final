@@ -9,7 +9,6 @@ const BOX_SIZE = 100;
 const TURN = 15;
 const MAX_PLANT_LEVEL = 3;
 const PLANT_GROWTH_ICONS = ["🌱", "🌾"];
-
 let TIME = 0;
 
 
@@ -19,7 +18,6 @@ document.title = APP_NAME;
 
 const gridDiv = document.createElement("div");
 app.append(gridDiv);
-
 
 const inventoryDiv = document.createElement("div");
 app.append(inventoryDiv);
