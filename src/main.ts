@@ -1,12 +1,12 @@
 import "./style.css";
 
 const PADDING = 0;
-const CANVAS_WIDTH = 400;
-const CANVAS_HEIGHT = 400;
-const DRAW_OFFSET_X = 10;
-const DRAW_OFFSET_Y = 35;
-const BOX_SIZE = 50;
-const TURN = 10;
+const CANVAS_WIDTH = 600;
+const CANVAS_HEIGHT = 600;
+const DRAW_OFFSET_X = 25;
+const DRAW_OFFSET_Y = 60;
+const BOX_SIZE = 100;
+const TURN = 15;
 const MAX_PLANT_LEVEL = 3;
 const PLANT_GROWTH_ICONS = ["🌱", "🌾"];
 
@@ -98,7 +98,7 @@ function drawGrid(){
 
 //Displays player on the grid
 function displayPlayer() {
-  ctx.font = "24px sans-serif";
+  ctx.font = "40px sans-serif";
   const x = (player.x * BOX_SIZE) + DRAW_OFFSET_X;
   const y = (player.y * BOX_SIZE) + DRAW_OFFSET_Y;
   ctx.fillText(player.icon, x, y);
@@ -108,19 +108,19 @@ function displayPlayer() {
 //TODO: Simplify displayPlayer() and displayPlant() into one function, displayIcon()
 function displayPlant(cell: Cell, x: number, y: number) {
   if(cell.plantIcon != null) {
-    ctx.font = "24px sans-serif";
+    ctx.font = "35px sans-serif";
     x = (x * BOX_SIZE) + DRAW_OFFSET_X;
     y = (y * BOX_SIZE) + DRAW_OFFSET_Y;
     ctx.fillText(cell.plantIcon, x , y);
 
     //Display plant info
-    ctx.font = "14px sans-serif";
+    ctx.font = "20px sans-serif";
     ctx.fillStyle = "#dad617"; //Yellow
-    ctx.fillText(cell.sunLevel.toString(), x - 6, y - 20);
+    ctx.fillText(cell.sunLevel.toString(), x - 15, y - 35);
     ctx.fillStyle = "#5faef8"; //Light blue
-    ctx.fillText(cell.waterLevel.toString(), x + 28, y - 20);
-    ctx.fillStyle = "black";
-    ctx.fillText(cell.plantLevel!.toString(), x + 28, y + 14);
+    ctx.fillText(cell.waterLevel.toString(), x + 50, y - 35);
+    //ctx.fillStyle = "black";
+    //ctx.fillText(cell.plantLevel!.toString(), x + 50, y + 35);
   }
 }
 
