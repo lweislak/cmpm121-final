@@ -75,14 +75,12 @@ interface SaveFile {
 }
 
 const grid: Cell[][] = [];
-let autosave: SaveFile = {
-  time: TIME,
-  playerPos: player,
-  savedGrid: grid
-}
-let save1: SaveFile;
-let save2: SaveFile;
-let save3: SaveFile;
+let undoStack: SaveFile[] = [];
+let redoStack: SaveFile[] = [];
+let autosave: SaveFile[] = [];
+let save1: SaveFile[] = [];
+let save2: SaveFile[] = [];
+let save3: SaveFile[] = [];
 
 //Code found at: https://stackoverflow.com/a/11736122
 //Draws a grid on the canvas
@@ -137,11 +135,11 @@ function displayPlant(cell: Cell, x: number, y: number) {
 
 //Check which key was pressed
 function checkKeys(key: string) {
-  //Note: 8 is the number of cells in the 2D array
+  //Note: 6 is the number of cells in the 2D array
   if(key == "ArrowUp" && player.y > 0) { player.y--; }
-  else if(key == "ArrowDown" && player.y < 7) { player.y++; }
+  else if(key == "ArrowDown" && player.y < 5) { player.y++; }
   else if(key == "ArrowLeft" && player.x > 0) { player.x--; }
-  else if(key == "ArrowRight" && player.x < 7) { player.x++; }
+  else if(key == "ArrowRight" && player.x < 5) { player.x++; }
   else if(key == "KeyE") {
     const cell = grid[player.x][player.y];
     if(!cell.plantLevel) {sow(cell); }
@@ -151,6 +149,7 @@ function checkKeys(key: string) {
   else { return; }
   TIME++;
   checkTurn();
+  saveSnapshot();
 }
 
 //Check if a turn has passed
@@ -261,6 +260,16 @@ function setButtons() {
       player.currentSeed = seed.icon;
     });
   }
+}
+
+//save a game to a file
+function saveSnapshot() {
+  let snapshot: SaveFile = {
+    time: TIME,
+    playerPos: player,
+    savedGrid: grid
+  }
+  undoStack.push(snapshot);
 }
 
 
