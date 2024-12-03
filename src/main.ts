@@ -68,7 +68,21 @@ const player: Player = {
   currentSeed: "🥔", //Default
 };
 
+interface SaveFile {
+  time: number;
+  playerPos: Player;
+  savedGrid:Cell[][];
+}
+
 const grid: Cell[][] = [];
+let autosave: SaveFile = {
+  time: TIME,
+  playerPos: player,
+  savedGrid: grid
+}
+let save1: SaveFile;
+let save2: SaveFile;
+let save3: SaveFile;
 
 //Code found at: https://stackoverflow.com/a/11736122
 //Draws a grid on the canvas
@@ -168,6 +182,7 @@ function checkGrowth(cell: Cell) {
   }
 }
 
+// Check neighboring cells for synergistic plants
 function checkNeighbors(i:number, j:number) {
   if (grid[i][j].plantLevel == null) {return;}
   for (const seed of seedTypes) {
