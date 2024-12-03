@@ -34,9 +34,9 @@ gridDiv.append(canvas);
 
 //Create buttons for different seeds
 const seedTypes = [
-  {"icon": "🥔", "button": null as HTMLButtonElement | null},
-  {"icon": "🥕", "button": null as HTMLButtonElement | null},
-  {"icon": "🌽", "button": null as HTMLButtonElement | null}
+  {"icon": "🥔", "desired": "🌽", "button": null as HTMLButtonElement | null},
+  {"icon": "🥕", "desired": "🥔", "button": null as HTMLButtonElement | null},
+  {"icon": "🌽", "desired": "🥕", "button": null as HTMLButtonElement | null}
 ]
 
 //Create player inventory
@@ -150,6 +150,7 @@ function checkTurn() {
         if(grid[i][j].waterLevel <= 0) { //If water level gets too low, plant dies
           killPlant(grid[i][j]);
         }
+        checkNeighbors(i, j);
         checkGrowth(grid[i][j]);
       }
     }
@@ -160,10 +161,34 @@ function checkTurn() {
 function checkGrowth(cell: Cell) {
   if(cell.plantLevel == MAX_PLANT_LEVEL) {return;}
   //If water level is above 10 and there is any sun on the cell, grow the plant
-  if(cell.waterLevel >= 10 && cell.sunLevel >= 0) { //Temporary values
+  if(cell.waterLevel >= 10 && cell.sunLevel >= 2) { //Temporary values
     cell.plantLevel!++;
     if(cell.plantLevel == MAX_PLANT_LEVEL) {cell.plantIcon = cell.plantType;}
     else {cell.plantIcon = PLANT_GROWTH_ICONS[cell.plantLevel! - 1];}
+  }
+}
+
+function checkNeighbors(i:number, j:number) {
+  if (grid[i][j].plantLevel == null) {return;}
+  for (const seed of seedTypes) {
+    if (grid[i][j].plantType == seed.icon) {
+      if (grid [i-1][j].plantType == seed.desired) {
+        water(grid[i][j]);
+        grid[i][j].sunLevel++;
+      }
+      if (grid[i+1][j].plantType == seed.desired) {
+        water(grid[i][j]);
+        grid[i][j].sunLevel++;
+      }
+      if (grid[i][j-1].plantType == seed.desired) {
+        water(grid[i][j]);
+        grid[i][j].sunLevel++;
+      }
+      if (grid[i][j+1].plantType == seed.desired) {
+        water(grid[i][j]);
+        grid[i][j].sunLevel++;
+      }
+    }
   }
 }
 
