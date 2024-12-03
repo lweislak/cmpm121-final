@@ -8,6 +8,7 @@ const DRAW_OFFSET_Y = 35;
 const BOX_SIZE = 50;
 const TURN = 10;
 const MAX_PLANT_LEVEL = 3;
+const PLANT_GROWTH_ICONS = ["🌱", "🌾"];
 
 let TIME = 0;
 
@@ -141,6 +142,7 @@ function checkKeys(key: string) {
   checkTurn();
 }
 
+//Check if a turn has passed
 function checkTurn() {
   if (TIME % TURN == 0) {
     for(let i = 0; i < CANVAS_HEIGHT/BOX_SIZE; i++) {
@@ -151,8 +153,20 @@ function checkTurn() {
         if(grid[i][j].waterLevel <= 0) { //If water level gets too low, plant dies
           killPlant(grid[i][j]);
         }
+        checkGrowth(grid[i][j]);
       }
     }
+  }
+}
+
+//Check each cell for growth conditions
+function checkGrowth(cell: Cell) {
+  if(cell.plantLevel == MAX_PLANT_LEVEL) {return;}
+  //If water level is above 10 and there is any sun on the cell, grow the plant
+  if(cell.waterLevel >= 10 && cell.sunLevel >= 0) { //Temporary values
+    cell.plantLevel!++;
+    if(cell.plantLevel == MAX_PLANT_LEVEL) {cell.plantIcon = cell.plantType;}
+    else {cell.plantIcon = PLANT_GROWTH_ICONS[cell.plantLevel! - 1];}
   }
 }
 
@@ -164,7 +178,7 @@ function killPlant(cell: Cell) {
 
 function sow(cell: Cell) {
   cell.plantLevel = 1;
-  cell.plantIcon = "🌱";
+  cell.plantIcon = PLANT_GROWTH_ICONS[0];
   cell.plantType = player.currentSeed;
   displayPlant(cell, player.x, player.y);
 }
@@ -181,6 +195,14 @@ function reap(cell: Cell) {
     }
   }
   killPlant(cell);
+  if(checkWin()) { console.log("YOU WIN"); }
+}
+
+function checkWin(): boolean {
+  for(const element of inventory) {
+    if(element.amount < 5) {  console.log("RETURN FALSE"); return false;}
+  }
+  return true;
 }
 
 function updateInventory() {
@@ -189,7 +211,6 @@ function updateInventory() {
     inventoryDiv.replaceChild(newNode, inventoryDiv.childNodes[i]);
   }
 }
-
 
 //Setup seed buttons
 function setButtons() {
@@ -236,6 +257,5 @@ addEventListener("keydown", (e) => {
 });
 
 drawGrid();
-
 displayPlayer();
 setButtons();
