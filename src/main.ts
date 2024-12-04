@@ -70,7 +70,9 @@ const player: Player = {
 
 interface SaveFile {
   time: number;
-  playerPos: Player;
+  playerX: number;
+  playerY: number;
+  seed: string;
   savedGrid:Cell[][];
 }
 
@@ -260,16 +262,72 @@ function setButtons() {
       player.currentSeed = seed.icon;
     });
   }
+  let undoButton = document.createElement("button");
+  undoButton.innerText = "Undo";
+  buttonDiv.append(undoButton);
+  undoButton.addEventListener("click", () => {
+    if (undoStack.length > 0) {
+      let snapshot = undoStack.pop();
+      TIME = snapshot!.time;  
+      player.x = snapshot!.playerX;
+      player.y = snapshot!.playerY;
+      player.currentSeed = snapshot!.seed;
+      for(let i = 0; i < CANVAS_HEIGHT/BOX_SIZE; i++) {
+        for(let j = 0; j < CANVAS_WIDTH /BOX_SIZE; j++) {
+          //grid[i][j] = snapshot!.savedGrid[i][j];
+          grid[i][j].plantIcon = snapshot!.savedGrid[i][j].plantIcon;
+          grid[i][j].sunLevel = snapshot!.savedGrid[i][j].sunLevel;
+          grid[i][j].waterLevel = snapshot!.savedGrid[i][j].waterLevel;
+          grid[i][j].plantType = snapshot!.savedGrid[i][j].plantType;
+          grid[i][j].plantLevel = snapshot!.savedGrid[i][j].plantLevel;
+        }
+      }
+      redoStack.push(snapshot!);
+      drawGrid();
+      displayPlayer();
+    }
+  });
+
+  let redoButton = document.createElement("button");
+  redoButton.innerText = "Redo";
+  buttonDiv.append(redoButton);
+  redoButton.addEventListener("click", () => {
+    if (redoStack.length > 0) {
+      let snapshot = redoStack.pop();
+      TIME = snapshot!.time;  
+      player.x = snapshot!.playerX;
+      player.y = snapshot!.playerY;
+      player.currentSeed = snapshot!.seed;
+      for(let i = 0; i < CANVAS_HEIGHT/BOX_SIZE; i++) {
+        for(let j = 0; j < CANVAS_WIDTH /BOX_SIZE; j++) {
+          grid[i][j] = snapshot!.savedGrid[i][j];
+        }
+      }
+      undoStack.push(snapshot!);
+      drawGrid();
+      displayPlayer();
+    }
+  });
 }
 
-//save a game to a file
+//save a snapshot of the game state
 function saveSnapshot() {
+  let snapGrid: Cell[][] = [];
+  for(let i = 0; i < CANVAS_HEIGHT/BOX_SIZE; i++) {
+    snapGrid[i] = [];
+    for(let j = 0; j < CANVAS_WIDTH /BOX_SIZE; j++) {
+      snapGrid[i].push(Object.assign({}, grid[i][j]));
+    }
+  }
   let snapshot: SaveFile = {
     time: TIME,
-    playerPos: player,
-    savedGrid: grid
+    playerX: player.x,
+    playerY: player.y,
+    seed: player.currentSeed,
+    savedGrid: snapGrid
   }
   undoStack.push(snapshot);
+  
 }
 
 
