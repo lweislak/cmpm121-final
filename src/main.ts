@@ -169,6 +169,7 @@ function checkTurn() {
         checkGrowth(grid[i][j]);
       }
     }
+    saveGame(autosave);
   }
 }
 
@@ -262,6 +263,9 @@ function setButtons() {
       player.currentSeed = seed.icon;
     });
   }
+
+  buttonDiv.append(document.createElement("br"));
+
   let undoButton = document.createElement("button");
   undoButton.innerText = "Undo";
   buttonDiv.append(undoButton);
@@ -274,12 +278,12 @@ function setButtons() {
       player.currentSeed = snapshot!.seed;
       for(let i = 0; i < CANVAS_HEIGHT/BOX_SIZE; i++) {
         for(let j = 0; j < CANVAS_WIDTH /BOX_SIZE; j++) {
-          //grid[i][j] = snapshot!.savedGrid[i][j];
-          grid[i][j].plantIcon = snapshot!.savedGrid[i][j].plantIcon;
-          grid[i][j].sunLevel = snapshot!.savedGrid[i][j].sunLevel;
-          grid[i][j].waterLevel = snapshot!.savedGrid[i][j].waterLevel;
-          grid[i][j].plantType = snapshot!.savedGrid[i][j].plantType;
-          grid[i][j].plantLevel = snapshot!.savedGrid[i][j].plantLevel;
+          grid[i][j] = snapshot!.savedGrid[i][j];
+          // grid[i][j].plantIcon = snapshot!.savedGrid[i][j].plantIcon;
+          // grid[i][j].sunLevel = snapshot!.savedGrid[i][j].sunLevel;
+          // grid[i][j].waterLevel = snapshot!.savedGrid[i][j].waterLevel;
+          // grid[i][j].plantType = snapshot!.savedGrid[i][j].plantType;
+          // grid[i][j].plantLevel = snapshot!.savedGrid[i][j].plantLevel;
         }
       }
       redoStack.push(snapshot!);
@@ -312,14 +316,14 @@ function setButtons() {
 
 //save a snapshot of the game state
 function saveSnapshot() {
-  let snapGrid: Cell[][] = [];
+  const snapGrid: Cell[][] = [];
   for(let i = 0; i < CANVAS_HEIGHT/BOX_SIZE; i++) {
     snapGrid[i] = [];
     for(let j = 0; j < CANVAS_WIDTH /BOX_SIZE; j++) {
       snapGrid[i].push(Object.assign({}, grid[i][j]));
     }
   }
-  let snapshot: SaveFile = {
+  const snapshot: SaveFile = {
     time: TIME,
     playerX: player.x,
     playerY: player.y,
@@ -327,7 +331,34 @@ function saveSnapshot() {
     savedGrid: snapGrid
   }
   undoStack.push(snapshot);
-  
+}
+
+function saveGame(file:SaveFile[]) {
+  file = [];
+  for (let i = 0; i < undoStack.length; i++) {
+    file.push(Object.assign({}, undoStack[i]));
+  }
+}
+
+function loadGame(file:SaveFile[]) {
+  if (file == null || file.length == 0) return;
+
+  undoStack = [];
+  for (let i = 0; i < file.length; i++) {
+    undoStack.push(Object.assign({}, file[i]));
+  }
+
+  let snapshot = undoStack.pop();
+  TIME = snapshot!.time;
+  player.x = snapshot!.playerX;
+  player.y = snapshot!.playerY;
+  player.currentSeed = snapshot!.seed;
+  for(let i = 0; i < CANVAS_HEIGHT/BOX_SIZE; i++) {
+    for(let j = 0; j < CANVAS_WIDTH /BOX_SIZE; j++) {
+      grid[i][j] = snapshot!.savedGrid[i][j];
+    }
+  }
+  undoStack.push(snapshot!);
 }
 
 
@@ -363,3 +394,4 @@ addEventListener("keydown", (e) => {
 drawGrid();
 displayPlayer();
 setButtons();
+saveSnapshot();
