@@ -152,6 +152,7 @@ function checkKeys(key: string) {
   TIME++;
   checkTurn();
   saveSnapshot();
+  console.log(`Length of file 1: ${save1.length}`);
 }
 
 //Check if a turn has passed
@@ -266,12 +267,12 @@ function setButtons() {
 
   buttonDiv.append(document.createElement("br"));
 
-  let undoButton = document.createElement("button");
+  const undoButton = document.createElement("button");
   undoButton.innerText = "Undo";
   buttonDiv.append(undoButton);
   undoButton.addEventListener("click", () => {
     if (undoStack.length > 0) {
-      let snapshot = undoStack.pop();
+      const snapshot = undoStack.pop();
       TIME = snapshot!.time;  
       player.x = snapshot!.playerX;
       player.y = snapshot!.playerY;
@@ -292,12 +293,12 @@ function setButtons() {
     }
   });
 
-  let redoButton = document.createElement("button");
+  const redoButton = document.createElement("button");
   redoButton.innerText = "Redo";
   buttonDiv.append(redoButton);
   redoButton.addEventListener("click", () => {
     if (redoStack.length > 0) {
-      let snapshot = redoStack.pop();
+      const snapshot = redoStack.pop();
       TIME = snapshot!.time;  
       player.x = snapshot!.playerX;
       player.y = snapshot!.playerY;
@@ -311,6 +312,52 @@ function setButtons() {
       drawGrid();
       displayPlayer();
     }
+  });
+
+  buttonDiv.append(document.createElement("br"));
+
+  const Save1Button = document.createElement("button");
+  Save1Button.innerText = "Save to File 1";
+  buttonDiv.append(Save1Button);
+  Save1Button.addEventListener("click", () => {
+    saveGame(save1);
+  });
+
+  const Save2Button = document.createElement("button");
+  Save2Button.innerText = "Save to File 2";
+  buttonDiv.append(Save2Button);
+  Save2Button.addEventListener("click", () => {
+    saveGame(save2);
+  });
+
+  const Save3Button = document.createElement("button");
+  Save3Button.innerText = "Save to File 3";
+  buttonDiv.append(Save3Button);
+  Save3Button.addEventListener("click", () => {
+    saveGame(save3);
+  });
+
+  buttonDiv.append(document.createElement("br"));
+
+  const Load1Button = document.createElement("button");
+  Load1Button.innerText = "Load game in File 1";
+  buttonDiv.append(Load1Button);
+  Load1Button.addEventListener("click", () => {
+    loadGame(save1);
+  });
+
+  const Load2Button = document.createElement("button");
+  Load2Button.innerText = "Load game in File 2";
+  buttonDiv.append(Load2Button);
+  Load2Button.addEventListener("click", () => {
+    loadGame(save2);
+  });
+
+  const Load3Button = document.createElement("button");
+  Load3Button.innerText = "Load game in File 3";
+  buttonDiv.append(Load3Button);
+  Load3Button.addEventListener("click", () => {
+    loadGame(save3);
   });
 }
 
@@ -338,17 +385,22 @@ function saveGame(file:SaveFile[]) {
   for (let i = 0; i < undoStack.length; i++) {
     file.push(Object.assign({}, undoStack[i]));
   }
+  console.log("Saved!");
+  console.log(`Length of save: ${file.length}`);
 }
 
 function loadGame(file:SaveFile[]) {
-  if (file == null || file.length == 0) return;
+  if (file == null || file.length == 0) {
+    console.log(`Length of save: ${file.length}`);
+    return;
+  }
 
   undoStack = [];
   for (let i = 0; i < file.length; i++) {
     undoStack.push(Object.assign({}, file[i]));
   }
 
-  let snapshot = undoStack.pop();
+  const snapshot = undoStack.pop();
   TIME = snapshot!.time;
   player.x = snapshot!.playerX;
   player.y = snapshot!.playerY;
@@ -359,6 +411,7 @@ function loadGame(file:SaveFile[]) {
     }
   }
   undoStack.push(snapshot!);
+  console.log("Loaded!");
 }
 
 
