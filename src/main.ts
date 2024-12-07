@@ -33,14 +33,14 @@ canvas.width = CANVAS_WIDTH;
 gridDiv.append(canvas);
 
 //Create buttons for different seeds
-const seedTypes = [
+let seedTypes = [
   {"icon": "🥔", "desired": "🌽", "button": null as HTMLButtonElement | null},
   {"icon": "🥕", "desired": "🥔", "button": null as HTMLButtonElement | null},
   {"icon": "🌽", "desired": "🥕", "button": null as HTMLButtonElement | null}
 ]
 
 //Create player inventory
-const inventory = [
+let inventory = [
   {"icon": "🥔", "amount": 0 as number},
   {"icon": "🥕", "amount": 0 as number},
   {"icon": "🌽", "amount": 0 as number}
@@ -61,7 +61,7 @@ interface Cell {
   plantType: string | null;
 }
 
-const player: Player = {
+let player: Player = {
   icon: "👩‍🌾",
   x: 0,
   y: 0,
@@ -76,7 +76,7 @@ interface SaveFile {
   savedGrid:Cell[][];
 }
 
-const grid: Cell[][] = [];
+let grid: Cell[][] = [];
 let undoStack: SaveFile[] = [];
 let redoStack: SaveFile[] = [];
 let autosave: SaveFile[] = [];
@@ -166,11 +166,12 @@ function checkTurn() {
         if(grid[i][j].waterLevel <= 0) { //If water level gets too low, plant dies
           killPlant(grid[i][j]);
         }
-        checkNeighbors(i, j);
+        //checkNeighbors(i, j);
+        water(grid[i][j]);
         checkGrowth(grid[i][j]);
       }
     }
-    saveGame(autosave);
+    //saveGame(autosave);
   }
 }
 
@@ -436,6 +437,37 @@ for(const element of inventory) {
   inventoryDiv.appendChild(txt);
   //inventoryDiv.append(document.createElement('br'));
 }
+
+function autoSaveGame(filename: string) {
+  const gameInfo = {
+    player,
+    grid,
+    TIME,
+    inventory,
+    seedTypes,
+  };
+  localStorage.setItem(filename, JSON.stringify(gameInfo));
+}
+
+function autoLoadGame(filename: string) {
+  const gameInfoJSON = localStorage.getItem(filename);
+  if (gameInfoJSON) {
+    const gameInfo = JSON.parse(gameInfoJSON);
+
+    player = gameInfo.player;
+    grid = gameInfo.grid;
+    TIME = gameInfo.TIME;
+    inventory = gameInfo.inventory;
+    seedTypes = gameInfo.seedTypes;
+  }
+  drawGrid();
+  displayPlayer();
+  updateInventory();
+}
+
+//Check for unexpected quits and reload game upon launch
+globalThis.addEventListener("beforeunload", () => {autoSaveGame("autoSave");});
+globalThis.addEventListener("load", () =>  {autoLoadGame("autoSave");});
 
 addEventListener("keydown", (e) => {
   const key = e.code;
