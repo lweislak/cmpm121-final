@@ -79,10 +79,6 @@ interface SaveFile {
 let grid: Cell[][] = [];
 let undoStack: SaveFile[] = [];
 let redoStack: SaveFile[] = [];
-let autosave: SaveFile[] = [];
-let save1: SaveFile[] = [];
-let save2: SaveFile[] = [];
-let save3: SaveFile[] = [];
 
 //Code found at: https://stackoverflow.com/a/11736122
 //Draws a grid on the canvas
@@ -152,7 +148,6 @@ function checkKeys(key: string) {
   TIME++;
   checkTurn();
   saveSnapshot();
-  console.log(`Length of file 1: ${save1.length}`);
 }
 
 //Check if a turn has passed
@@ -171,7 +166,6 @@ function checkTurn() {
         checkGrowth(grid[i][j]);
       }
     }
-    //saveGame(autosave);
   }
 }
 
@@ -321,21 +315,21 @@ function setButtons() {
   Save1Button.innerText = "Save to File 1";
   buttonDiv.append(Save1Button);
   Save1Button.addEventListener("click", () => {
-    saveGame(save1);
+    saveGame("save1");
   });
 
   const Save2Button = document.createElement("button");
   Save2Button.innerText = "Save to File 2";
   buttonDiv.append(Save2Button);
   Save2Button.addEventListener("click", () => {
-    saveGame(save2);
+    saveGame("save2");
   });
 
   const Save3Button = document.createElement("button");
   Save3Button.innerText = "Save to File 3";
   buttonDiv.append(Save3Button);
   Save3Button.addEventListener("click", () => {
-    saveGame(save3);
+    saveGame("save3");
   });
 
   buttonDiv.append(document.createElement("br"));
@@ -344,23 +338,24 @@ function setButtons() {
   Load1Button.innerText = "Load game in File 1";
   buttonDiv.append(Load1Button);
   Load1Button.addEventListener("click", () => {
-    loadGame(save1);
+    loadGame("save1");
   });
 
   const Load2Button = document.createElement("button");
   Load2Button.innerText = "Load game in File 2";
   buttonDiv.append(Load2Button);
   Load2Button.addEventListener("click", () => {
-    loadGame(save2);
+    loadGame("save2");
   });
 
   const Load3Button = document.createElement("button");
   Load3Button.innerText = "Load game in File 3";
   buttonDiv.append(Load3Button);
   Load3Button.addEventListener("click", () => {
-    loadGame(save3);
+    loadGame("save3");
   });
 }
+
 
 //save a snapshot of the game state
 function saveSnapshot() {
@@ -380,41 +375,6 @@ function saveSnapshot() {
   }
   undoStack.push(snapshot);
 }
-
-function saveGame(file:SaveFile[]) {
-  file = [];
-  for (let i = 0; i < undoStack.length; i++) {
-    file.push(Object.assign({}, undoStack[i]));
-  }
-  console.log("Saved!");
-  console.log(`Length of save: ${file.length}`);
-}
-
-function loadGame(file:SaveFile[]) {
-  if (file == null || file.length == 0) {
-    console.log(`Length of save: ${file.length}`);
-    return;
-  }
-
-  undoStack = [];
-  for (let i = 0; i < file.length; i++) {
-    undoStack.push(Object.assign({}, file[i]));
-  }
-
-  const snapshot = undoStack.pop();
-  TIME = snapshot!.time;
-  player.x = snapshot!.playerX;
-  player.y = snapshot!.playerY;
-  player.currentSeed = snapshot!.seed;
-  for(let i = 0; i < CANVAS_HEIGHT/BOX_SIZE; i++) {
-    for(let j = 0; j < CANVAS_WIDTH /BOX_SIZE; j++) {
-      grid[i][j] = snapshot!.savedGrid[i][j];
-    }
-  }
-  undoStack.push(snapshot!);
-  console.log("Loaded!");
-}
-
 
 //Populate grid with cells
 for(let i = 0; i < CANVAS_HEIGHT/BOX_SIZE; i++) {
@@ -438,19 +398,22 @@ for(const element of inventory) {
   //inventoryDiv.append(document.createElement('br'));
 }
 
-function autoSaveGame(filename: string) {
+function saveGame(filename: string) {
   const gameInfo = {
     player,
     grid,
     TIME,
     inventory,
     seedTypes,
+    undoStack,
+    redoStack,
   };
   localStorage.setItem(filename, JSON.stringify(gameInfo));
 }
 
-function autoLoadGame(filename: string) {
+function loadGame(filename: string) {
   const gameInfoJSON = localStorage.getItem(filename);
+  //localStorage.deleteItem(filename); //FOR TESTING ONLY. Causes error and resets loading
   if (gameInfoJSON) {
     const gameInfo = JSON.parse(gameInfoJSON);
 
@@ -459,6 +422,14 @@ function autoLoadGame(filename: string) {
     TIME = gameInfo.TIME;
     inventory = gameInfo.inventory;
     seedTypes = gameInfo.seedTypes;
+    gameInfo.undoStack.forEach((saveFile: SaveFile) => {
+      undoStack.push(Object.assign({}, saveFile));
+    });
+    gameInfo.redoStack.forEach((saveFile: SaveFile) => {
+      redoStack.push(saveFile);
+    });
+
+    console.log(redoStack);
   }
   drawGrid();
   displayPlayer();
@@ -466,8 +437,8 @@ function autoLoadGame(filename: string) {
 }
 
 //Check for unexpected quits and reload game upon launch
-globalThis.addEventListener("beforeunload", () => {autoSaveGame("autoSave");});
-globalThis.addEventListener("load", () =>  {autoLoadGame("autoSave");});
+globalThis.addEventListener("beforeunload", () => {saveGame("autoSave");});
+globalThis.addEventListener("load", () =>  {loadGame("autoSave");});
 
 addEventListener("keydown", (e) => {
   const key = e.code;
