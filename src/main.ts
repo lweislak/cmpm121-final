@@ -33,14 +33,14 @@ canvas.width = CANVAS_WIDTH;
 gridDiv.append(canvas);
 
 //Create buttons for different seeds
-const seedTypes = [
+let seedTypes = [
   {"icon": "🥔", "desired": "🌽", "button": null as HTMLButtonElement | null},
   {"icon": "🥕", "desired": "🥔", "button": null as HTMLButtonElement | null},
   {"icon": "🌽", "desired": "🥕", "button": null as HTMLButtonElement | null}
 ]
 
 //Create player inventory
-const inventory = [
+let inventory = [
   {"icon": "🥔", "amount": 0 as number},
   {"icon": "🥕", "amount": 0 as number},
   {"icon": "🌽", "amount": 0 as number}
@@ -61,14 +61,24 @@ interface Cell {
   plantType: string | null;
 }
 
-const player: Player = {
+let player: Player = {
   icon: "👩‍🌾",
   x: 0,
   y: 0,
   currentSeed: "🥔", //Default
 };
 
-const grid: Cell[][] = [];
+interface SaveFile {
+  time: number;
+  playerX: number;
+  playerY: number;
+  seed: string;
+  savedGrid:Cell[][];
+}
+
+let grid: Cell[][] = [];
+let undoStack: SaveFile[] = [];
+let redoStack: SaveFile[] = [];
 
 //Code found at: https://stackoverflow.com/a/11736122
 //Draws a grid on the canvas
@@ -123,11 +133,11 @@ function displayPlant(cell: Cell, x: number, y: number) {
 
 //Check which key was pressed
 function checkKeys(key: string) {
-  //Note: 8 is the number of cells in the 2D array
+  //Note: 6 is the number of cells in the 2D array
   if(key == "ArrowUp" && player.y > 0) { player.y--; }
-  else if(key == "ArrowDown" && player.y < 7) { player.y++; }
+  else if(key == "ArrowDown" && player.y < 5) { player.y++; }
   else if(key == "ArrowLeft" && player.x > 0) { player.x--; }
-  else if(key == "ArrowRight" && player.x < 7) { player.x++; }
+  else if(key == "ArrowRight" && player.x < 5) { player.x++; }
   else if(key == "KeyE") {
     const cell = grid[player.x][player.y];
     if(!cell.plantLevel) {sow(cell); }
@@ -137,6 +147,7 @@ function checkKeys(key: string) {
   else { return; }
   TIME++;
   checkTurn();
+  saveSnapshot();
 }
 
 //Check if a turn has passed
@@ -150,7 +161,8 @@ function checkTurn() {
         if(grid[i][j].waterLevel <= 0) { //If water level gets too low, plant dies
           killPlant(grid[i][j]);
         }
-        checkNeighbors(i, j);
+        //checkNeighbors(i, j);
+        water(grid[i][j]);
         checkGrowth(grid[i][j]);
       }
     }
@@ -168,6 +180,7 @@ function checkGrowth(cell: Cell) {
   }
 }
 
+// Check neighboring cells for synergistic plants
 function checkNeighbors(i:number, j:number) {
   if (grid[i][j].plantLevel == null) {return;}
   for (const seed of seedTypes) {
@@ -246,8 +259,122 @@ function setButtons() {
       player.currentSeed = seed.icon;
     });
   }
+
+  buttonDiv.append(document.createElement("br"));
+
+  const undoButton = document.createElement("button");
+  undoButton.innerText = "Undo";
+  buttonDiv.append(undoButton);
+  undoButton.addEventListener("click", () => {
+    if (undoStack.length > 0) {
+      const snapshot = undoStack.pop();
+      TIME = snapshot!.time;  
+      player.x = snapshot!.playerX;
+      player.y = snapshot!.playerY;
+      player.currentSeed = snapshot!.seed;
+      for(let i = 0; i < CANVAS_HEIGHT/BOX_SIZE; i++) {
+        for(let j = 0; j < CANVAS_WIDTH /BOX_SIZE; j++) {
+          grid[i][j] = snapshot!.savedGrid[i][j];
+          // grid[i][j].plantIcon = snapshot!.savedGrid[i][j].plantIcon;
+          // grid[i][j].sunLevel = snapshot!.savedGrid[i][j].sunLevel;
+          // grid[i][j].waterLevel = snapshot!.savedGrid[i][j].waterLevel;
+          // grid[i][j].plantType = snapshot!.savedGrid[i][j].plantType;
+          // grid[i][j].plantLevel = snapshot!.savedGrid[i][j].plantLevel;
+        }
+      }
+      redoStack.push(snapshot!);
+      drawGrid();
+      displayPlayer();
+    }
+  });
+
+  const redoButton = document.createElement("button");
+  redoButton.innerText = "Redo";
+  buttonDiv.append(redoButton);
+  redoButton.addEventListener("click", () => {
+    if (redoStack.length > 0) {
+      const snapshot = redoStack.pop();
+      TIME = snapshot!.time;  
+      player.x = snapshot!.playerX;
+      player.y = snapshot!.playerY;
+      player.currentSeed = snapshot!.seed;
+      for(let i = 0; i < CANVAS_HEIGHT/BOX_SIZE; i++) {
+        for(let j = 0; j < CANVAS_WIDTH /BOX_SIZE; j++) {
+          grid[i][j] = snapshot!.savedGrid[i][j];
+        }
+      }
+      undoStack.push(snapshot!);
+      drawGrid();
+      displayPlayer();
+    }
+  });
+
+  buttonDiv.append(document.createElement("br"));
+
+  const Save1Button = document.createElement("button");
+  Save1Button.innerText = "Save to File 1";
+  buttonDiv.append(Save1Button);
+  Save1Button.addEventListener("click", () => {
+    saveGame("save1");
+  });
+
+  const Save2Button = document.createElement("button");
+  Save2Button.innerText = "Save to File 2";
+  buttonDiv.append(Save2Button);
+  Save2Button.addEventListener("click", () => {
+    saveGame("save2");
+  });
+
+  const Save3Button = document.createElement("button");
+  Save3Button.innerText = "Save to File 3";
+  buttonDiv.append(Save3Button);
+  Save3Button.addEventListener("click", () => {
+    saveGame("save3");
+  });
+
+  buttonDiv.append(document.createElement("br"));
+
+  const Load1Button = document.createElement("button");
+  Load1Button.innerText = "Load game in File 1";
+  buttonDiv.append(Load1Button);
+  Load1Button.addEventListener("click", () => {
+    loadGame("save1");
+  });
+
+  const Load2Button = document.createElement("button");
+  Load2Button.innerText = "Load game in File 2";
+  buttonDiv.append(Load2Button);
+  Load2Button.addEventListener("click", () => {
+    loadGame("save2");
+  });
+
+  const Load3Button = document.createElement("button");
+  Load3Button.innerText = "Load game in File 3";
+  buttonDiv.append(Load3Button);
+  Load3Button.addEventListener("click", () => {
+    loadGame("save3");
+  });
 }
 
+
+//save a snapshot of the game state
+function saveSnapshot() {
+  const snapGrid: Cell[][] = [];
+  for(let i = 0; i < CANVAS_HEIGHT/BOX_SIZE; i++) {
+    snapGrid[i] = [];
+    for(let j = 0; j < CANVAS_WIDTH /BOX_SIZE; j++) {
+      snapGrid[i].push(Object.assign({}, grid[i][j]));
+    }
+  }
+  const snapshot: SaveFile = {
+    time: TIME,
+    playerX: player.x,
+    playerY: player.y,
+    seed: player.currentSeed,
+    savedGrid: snapGrid
+  }
+  undoStack.push(snapshot);
+}
 
 //Populate grid with cells
 for(let i = 0; i < CANVAS_HEIGHT/BOX_SIZE; i++) {
@@ -271,6 +398,48 @@ for(const element of inventory) {
   //inventoryDiv.append(document.createElement('br'));
 }
 
+function saveGame(filename: string) {
+  const gameInfo = {
+    player,
+    grid,
+    TIME,
+    inventory,
+    seedTypes,
+    undoStack,
+    redoStack,
+  };
+  localStorage.setItem(filename, JSON.stringify(gameInfo));
+}
+
+function loadGame(filename: string) {
+  const gameInfoJSON = localStorage.getItem(filename);
+  //localStorage.deleteItem(filename); //FOR TESTING ONLY. Causes error and resets loading
+  if (gameInfoJSON) {
+    const gameInfo = JSON.parse(gameInfoJSON);
+
+    player = gameInfo.player;
+    grid = gameInfo.grid;
+    TIME = gameInfo.TIME;
+    inventory = gameInfo.inventory;
+    seedTypes = gameInfo.seedTypes;
+    gameInfo.undoStack.forEach((saveFile: SaveFile) => {
+      undoStack.push(Object.assign({}, saveFile));
+    });
+    gameInfo.redoStack.forEach((saveFile: SaveFile) => {
+      redoStack.push(saveFile);
+    });
+
+    console.log(redoStack);
+  }
+  drawGrid();
+  displayPlayer();
+  updateInventory();
+}
+
+//Check for unexpected quits and reload game upon launch
+globalThis.addEventListener("beforeunload", () => {saveGame("autoSave");});
+globalThis.addEventListener("load", () =>  {loadGame("autoSave");});
+
 addEventListener("keydown", (e) => {
   const key = e.code;
   checkKeys(key);
@@ -281,3 +450,4 @@ addEventListener("keydown", (e) => {
 drawGrid();
 displayPlayer();
 setButtons();
+saveSnapshot();
