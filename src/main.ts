@@ -192,7 +192,7 @@ function checkNeighbors(index: number) {
     ];
     if (cell.plantType == seed.icon) {
       cellsToCheck.forEach((neighborIndex) => {
-        if((0 < neighborIndex) && (neighborIndex < GRID_LENGTH * GRID_WIDTH)
+        if((0 <= neighborIndex) && (neighborIndex < GRID_LENGTH * GRID_WIDTH)
         && (grid[neighborIndex]).plantType == seed.desired) {
           cell.waterLevel++;
         }
