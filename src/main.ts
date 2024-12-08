@@ -188,19 +188,21 @@ function checkNeighbors(i:number, j:number) {
   if (grid[i][j].plantLevel == null) {return;}
   for (const seed of seedTypes) {
     if (grid[i][j].plantType == seed.icon) {
-      if (grid [i-1][j].plantType == seed.desired) {
+      if (i-1 >= 0 && grid [i-1][j].plantType == seed.desired) {
         water(grid[i][j]);
         grid[i][j].sunLevel++;
       }
-      if (grid[i+1][j].plantType == seed.desired) {
+      if (i+1 < CANVAS_HEIGHT/BOX_SIZE &&
+        grid[i+1][j].plantType == seed.desired) {
         water(grid[i][j]);
         grid[i][j].sunLevel++;
       }
-      if (grid[i][j-1].plantType == seed.desired) {
+      if (j-1 >= 0 && grid[i][j-1].plantType == seed.desired) {
         water(grid[i][j]);
         grid[i][j].sunLevel++;
       }
-      if (grid[i][j+1].plantType == seed.desired) {
+      if (j+1 < CANVAS_HEIGHT/BOX_SIZE &&
+        grid[i][j+1].plantType == seed.desired) {
         water(grid[i][j]);
         grid[i][j].sunLevel++;
       }
