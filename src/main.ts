@@ -6,6 +6,9 @@ const CANVAS_HEIGHT = 600;
 const DRAW_OFFSET_X = 25;
 const DRAW_OFFSET_Y = 60;
 const BOX_SIZE = 100;
+
+const GRID_LENGTH = 6;
+const GRID_WIDTH = 6;
 const TURN = 15;
 const MAX_PLANT_LEVEL = 3;
 const PLANT_GROWTH_ICONS = ["🌱", "🌾"];
@@ -73,12 +76,13 @@ interface SaveFile {
   playerX: number;
   playerY: number;
   seed: string;
-  savedGrid:Cell[][];
+  savedGrid:Cell[];
 }
 
-let grid: Cell[][] = [];
-let undoStack: SaveFile[] = [];
-let redoStack: SaveFile[] = [];
+//let grid: Cell[][] = [];
+let grid: Cell[] = [];
+const undoStack: SaveFile[] = [];
+const redoStack: SaveFile[] = [];
 
 //Code found at: https://stackoverflow.com/a/11736122
 //Draws a grid on the canvas
@@ -97,11 +101,9 @@ function drawGrid(){
   ctx.strokeStyle = "#291702"; //Dark Brown
   ctx.stroke();
 
-  for(let i = 0; i < CANVAS_HEIGHT/BOX_SIZE; i++) {
-    for(let j = 0; j < CANVAS_WIDTH/BOX_SIZE; j ++) {
-      displayPlant(grid[i][j], i, j);
-    }
-  }
+   for(let x = 0; x < grid.length; x++) {
+    displayPlant(grid[x], x % GRID_LENGTH, Math.floor(x / GRID_WIDTH));
+   }
 }
 
 //Displays player on the grid
@@ -126,20 +128,17 @@ function displayPlant(cell: Cell, x: number, y: number) {
     ctx.fillText(cell.sunLevel.toString(), x - 15, y - 35);
     ctx.fillStyle = "#5faef8"; //Light blue
     ctx.fillText(cell.waterLevel.toString(), x + 50, y - 35);
-    //ctx.fillStyle = "black";
-    //ctx.fillText(cell.plantLevel!.toString(), x + 50, y + 35);
   }
 }
 
 //Check which key was pressed
 function checkKeys(key: string) {
-  //Note: 6 is the number of cells in the 2D array
   if(key == "ArrowUp" && player.y > 0) { player.y--; }
   else if(key == "ArrowDown" && player.y < 5) { player.y++; }
   else if(key == "ArrowLeft" && player.x > 0) { player.x--; }
   else if(key == "ArrowRight" && player.x < 5) { player.x++; }
   else if(key == "KeyE") {
-    const cell = grid[player.x][player.y];
+    const cell = grid[player.x  + (player.y * GRID_WIDTH)];
     if(!cell.plantLevel) {sow(cell); }
     else if(cell.plantLevel == MAX_PLANT_LEVEL) { reap(cell); }
     else { water(cell); }
@@ -153,21 +152,20 @@ function checkKeys(key: string) {
 //Check if a turn has passed
 function checkTurn() {
   if (TIME % TURN == 0) {
-    for(let i = 0; i < CANVAS_HEIGHT/BOX_SIZE; i++) {
-      for(let j = 0; j < CANVAS_WIDTH /BOX_SIZE; j++) {
-        grid[i][j].waterLevel -= grid[i][j].sunLevel; //Sun level decreases water level each turn
-        grid[i][j].waterLevel += Math.round(Math.random() * 3);
-        grid[i][j].sunLevel = Math.round(Math.random() * 5);
-        if(grid[i][j].waterLevel <= 0) { //If water level gets too low, plant dies
-          killPlant(grid[i][j]);
+    for(let x = 0; x < CANVAS_HEIGHT/BOX_SIZE; x++) {
+        grid[x].waterLevel -= grid[x].sunLevel; //Sun level decreases water level each turn
+        grid[x].waterLevel += Math.round(Math.random() * 3);
+        grid[x].sunLevel = Math.round(Math.random() * 5);
+        if(grid[x].waterLevel <= 0) { //If water level gets too low, plant dies
+          killPlant(grid[x]);
         }
         //checkNeighbors(i, j);
-        water(grid[i][j]);
-        checkGrowth(grid[i][j]);
-      }
+        water(grid[x]);
+        checkGrowth(grid[x]);
     }
   }
 }
+
 
 //Check each cell for growth conditions
 function checkGrowth(cell: Cell) {
@@ -180,6 +178,7 @@ function checkGrowth(cell: Cell) {
   }
 }
 
+/*
 // Check neighboring cells for synergistic plants
 function checkNeighbors(i:number, j:number) {
   if (grid[i][j].plantLevel == null) {return;}
@@ -204,6 +203,7 @@ function checkNeighbors(i:number, j:number) {
     }
   }
 }
+  */
 
 function killPlant(cell: Cell) {
   cell.plantIcon = null;
@@ -272,15 +272,13 @@ function setButtons() {
       player.x = snapshot!.playerX;
       player.y = snapshot!.playerY;
       player.currentSeed = snapshot!.seed;
-      for(let i = 0; i < CANVAS_HEIGHT/BOX_SIZE; i++) {
-        for(let j = 0; j < CANVAS_WIDTH /BOX_SIZE; j++) {
-          grid[i][j] = snapshot!.savedGrid[i][j];
+      for(let x = 0; x < (CANVAS_HEIGHT * CANVAS_WIDTH) / BOX_SIZE; x++) {
+          grid[x] = snapshot!.savedGrid[x];
           // grid[i][j].plantIcon = snapshot!.savedGrid[i][j].plantIcon;
           // grid[i][j].sunLevel = snapshot!.savedGrid[i][j].sunLevel;
           // grid[i][j].waterLevel = snapshot!.savedGrid[i][j].waterLevel;
           // grid[i][j].plantType = snapshot!.savedGrid[i][j].plantType;
           // grid[i][j].plantLevel = snapshot!.savedGrid[i][j].plantLevel;
-        }
       }
       redoStack.push(snapshot!);
       drawGrid();
@@ -298,10 +296,8 @@ function setButtons() {
       player.x = snapshot!.playerX;
       player.y = snapshot!.playerY;
       player.currentSeed = snapshot!.seed;
-      for(let i = 0; i < CANVAS_HEIGHT/BOX_SIZE; i++) {
-        for(let j = 0; j < CANVAS_WIDTH /BOX_SIZE; j++) {
-          grid[i][j] = snapshot!.savedGrid[i][j];
-        }
+      for(let x = 0; x < (CANVAS_HEIGHT * CANVAS_WIDTH) / BOX_SIZE; x++) {
+        grid[x] = snapshot!.savedGrid[x];
       }
       undoStack.push(snapshot!);
       drawGrid();
@@ -356,15 +352,11 @@ function setButtons() {
   });
 }
 
-
 //save a snapshot of the game state
 function saveSnapshot() {
-  const snapGrid: Cell[][] = [];
-  for(let i = 0; i < CANVAS_HEIGHT/BOX_SIZE; i++) {
-    snapGrid[i] = [];
-    for(let j = 0; j < CANVAS_WIDTH /BOX_SIZE; j++) {
-      snapGrid[i].push(Object.assign({}, grid[i][j]));
-    }
+  const snapGrid: Cell[] = [];
+  for(let x = 0; x < (CANVAS_HEIGHT * CANVAS_WIDTH) / BOX_SIZE; x++) {
+    snapGrid[x] = (Object.assign({}, grid[x]));
   }
   const snapshot: SaveFile = {
     time: TIME,
@@ -374,28 +366,6 @@ function saveSnapshot() {
     savedGrid: snapGrid
   }
   undoStack.push(snapshot);
-}
-
-//Populate grid with cells
-for(let i = 0; i < CANVAS_HEIGHT/BOX_SIZE; i++) {
-  grid[i] = [];
-  for(let j = 0; j < CANVAS_WIDTH /BOX_SIZE; j++) {
-    const cell: Cell = {
-      sunLevel: Math.round(Math.random() * 5),
-      waterLevel: 0,
-      plantIcon: null,
-      plantLevel: null,
-      plantType: null,
-    }
-    grid[i][j] = cell;
-  }
-}
-
-//Display inventory
-for(const element of inventory) {
-  const txt = document.createTextNode(`${element.icon!}: ${element.amount.toString()}\n`);
-  inventoryDiv.appendChild(txt);
-  //inventoryDiv.append(document.createElement('br'));
 }
 
 function saveGame(filename: string) {
@@ -422,14 +392,13 @@ function loadGame(filename: string) {
     TIME = gameInfo.TIME;
     inventory = gameInfo.inventory;
     seedTypes = gameInfo.seedTypes;
+
     gameInfo.undoStack.forEach((saveFile: SaveFile) => {
       undoStack.push(Object.assign({}, saveFile));
     });
     gameInfo.redoStack.forEach((saveFile: SaveFile) => {
       redoStack.push(saveFile);
     });
-
-    console.log(redoStack);
   }
   drawGrid();
   displayPlayer();
@@ -446,6 +415,25 @@ addEventListener("keydown", (e) => {
   drawGrid();
   displayPlayer();
 });
+
+//Populate grid with cells
+for(let x = 0; x < (GRID_LENGTH * GRID_WIDTH); x++) {
+    const cell: Cell = {
+      sunLevel: Math.round(Math.random() * 5),
+      waterLevel: 0,
+      plantIcon: null,
+      plantLevel: null,
+      plantType: null,
+    }
+    grid[x] = cell;
+}
+
+//Display inventory
+for(const element of inventory) {
+  const txt = document.createTextNode(`${element.icon!}: ${element.amount.toString()}\n`);
+  inventoryDiv.appendChild(txt);
+  //inventoryDiv.append(document.createElement('br'));
+}
 
 drawGrid();
 displayPlayer();
