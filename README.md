@@ -26,7 +26,7 @@ The visual design is going to be the most difficult part of the project. This in
 We hope to gain more knowledge about implementing game systems on a short time frame.
 We don't have to come up with the premise, so it'll be a good test of how to make a game based on given guidelines.
 
-# Devlog Entry 12/07/2024
+# Devlog Entry 12/05/2024
 
 F0 complete!
 
@@ -46,3 +46,9 @@ F0.e: Each plant has a distinct type, 🥔, 🥕, or 🌽. You can select which 
 F0.f: The simple spatial rules that govern plant growth are as follows: Plants check to see if they grow every few actions. If a plant has zero water, it dies. If it doesn't die, a plant checks it's cardinal neighbors; if a neighboring plant type matches it's "desired" plant type, one level is added to the water and sun for the tile. If the plant has more than 10 water and at least 2 sun, they grow to the next stage. Planting a plant in the center of a bunch of it's desired plant thus increases sun and water a lot, making it more likely to grow to the next stage.
 
 F0.g: Play concludes when a certain amount of plants have been successfully harvested, currently five of each. Plants can be lost but harvested ingredients cannot, meaning a player can successfully win the game by planting each plant, watering it excessively, and harvesting it five times over per plant type.
+
+Reflection
+--------------------------------------------
+Our plan changed due to the software requirements of F1 and F2. Doing the project in Unity when both of us were rusty seemed like a losing proposition. We decided to switch to pure Typescript instead, as it will be easier to satisfy F2.c later on down the line, and it's been our primary programming language for this quarter. Lo satisfied most of the requirements for this stage of development, as Victoria was having difficulties with other classes and out-of-class events. Victoria's main contribution for this stage was in the design with the Design Document, and in F0.f and a little of F0.a.
+
+#Devlog Entry 12/08/2024
