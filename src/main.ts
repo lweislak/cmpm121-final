@@ -79,7 +79,6 @@ interface SaveFile {
   savedGrid:Cell[];
 }
 
-//let grid: Cell[][] = [];
 let grid: Cell[] = [];
 const undoStack: SaveFile[] = [];
 const redoStack: SaveFile[] = [];
@@ -152,14 +151,14 @@ function checkKeys(key: string) {
 //Check if a turn has passed
 function checkTurn() {
   if (TIME % TURN == 0) {
-    for(let x = 0; x < CANVAS_HEIGHT/BOX_SIZE; x++) {
+    for(let x = 0; x < (GRID_LENGTH * GRID_WIDTH); x++) {
         grid[x].waterLevel -= grid[x].sunLevel; //Sun level decreases water level each turn
         grid[x].waterLevel += Math.round(Math.random() * 3);
         grid[x].sunLevel = Math.round(Math.random() * 5);
         if(grid[x].waterLevel <= 0) { //If water level gets too low, plant dies
           killPlant(grid[x]);
         }
-        //checkNeighbors(i, j);
+        checkNeighbors(x);
         water(grid[x]);
         checkGrowth(grid[x]);
     }
@@ -178,32 +177,30 @@ function checkGrowth(cell: Cell) {
   }
 }
 
-/*
+
 // Check neighboring cells for synergistic plants
-function checkNeighbors(i:number, j:number) {
-  if (grid[i][j].plantLevel == null) {return;}
+// Increase the cell's water if compatible
+function checkNeighbors(index: number) {
+  const cell = grid[index];
+  if (cell.plantLevel == null) {return;}
   for (const seed of seedTypes) {
-    if (grid[i][j].plantType == seed.icon) {
-      if (grid [i-1][j].plantType == seed.desired) {
-        water(grid[i][j]);
-        grid[i][j].sunLevel++;
-      }
-      if (grid[i+1][j].plantType == seed.desired) {
-        water(grid[i][j]);
-        grid[i][j].sunLevel++;
-      }
-      if (grid[i][j-1].plantType == seed.desired) {
-        water(grid[i][j]);
-        grid[i][j].sunLevel++;
-      }
-      if (grid[i][j+1].plantType == seed.desired) {
-        water(grid[i][j]);
-        grid[i][j].sunLevel++;
-      }
+    const cellsToCheck = [
+    index - 1, //left
+    index + 1, //right
+    index - GRID_LENGTH, //up
+    index + GRID_LENGTH //down
+    ];
+    if (cell.plantType == seed.icon) {
+      cellsToCheck.forEach((neighborIndex) => {
+        if((0 < neighborIndex) && (neighborIndex < GRID_LENGTH * GRID_WIDTH)
+        && (grid[neighborIndex]).plantType == seed.desired) {
+          cell.waterLevel++;
+        }
+      });
     }
   }
 }
-  */
+
 
 function killPlant(cell: Cell) {
   cell.plantIcon = null;
