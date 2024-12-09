@@ -165,9 +165,9 @@ function drawGrid(){
   ctx.strokeStyle = "#291702"; //Dark Brown
   ctx.stroke();
 
-   for(let x = 0; x < grid.length; x++) {
+  for(let x = 0; x < grid.length; x++) {
     displayPlant(grid[x], x % GRID_LENGTH, Math.floor(x / GRID_WIDTH));
-   }
+  }
 }
 
 //Displays player on the grid
@@ -222,6 +222,7 @@ function checkKeys(key: string) {
 function checkTurn() {
   if (TIME % TURN == 0) {
     for(let x = 0; x < (GRID_LENGTH * GRID_WIDTH); x++) {
+      if(grid[x].plantLevel!) {
         grid[x].waterLevel -= grid[x].sunLevel; //Sun level decreases water level each turn
         grid[x].waterLevel += Math.round(Math.random() * maxWaterAmount);
         grid[x].sunLevel = Math.round(Math.random() * maxSunAmount);
@@ -229,8 +230,9 @@ function checkTurn() {
           killPlant(grid[x]);
         }
         checkNeighbors(x);
-        water(grid[x]);
+        //water(grid[x]);
         checkGrowth(grid[x]);
+      }
     }
   }
 }
@@ -523,7 +525,7 @@ addEventListener("keydown", (e) => {
 //Populate grid with cells
 for(let x = 0; x < (GRID_LENGTH * GRID_WIDTH); x++) {
     const cell: Cell = {
-      sunLevel: Math.round(Math.random() * 3),
+      sunLevel: 0,
       waterLevel: 0,
       plantIcon: null,
       plantLevel: null,
