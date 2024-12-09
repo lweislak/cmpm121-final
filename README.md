@@ -83,7 +83,7 @@ F1.d: Undo and redo functionality is present, similar to D2. The player can undo
 
 Reflection
 --------------------------------------------
-Victoria took a larger role for F1, working on the undo and redo stacks as well as the autosave and save functionalities and associated UI for F1.a, F1.c, and F1.d as well as half of F1.b. The total team effort ended up being split more 50/50, as she misunderstood F1.a and due to skipping F3 for health reasons, the saves were stored only during run time rather than being persistant. Lo thus ended up doing the majority of the work for F1.a and F1.b as a result. As Victoria has been falling behind, we have determined that she should be taking care of the devlogs and the video submissions.
+Victoria took a larger role for F1, working on the undo and redo stacks as well as the autosave and save functionalities and associated UI for F1.a, F1.c, and F1.d as well as half of F1.b. The total team effort ended up being split more 50/50, as she misunderstood F1.a and due to skipping D3 for health reasons, the saves were stored only during run time rather than being persistant. Lo thus ended up doing the majority of the work for F1.a and F1.b as a result. As Victoria has been falling behind, we have determined that she should be taking care of the devlogs and the video submissions.
 
 # Devlog 12/08/2024
 
@@ -94,12 +94,21 @@ How we satisfied the software requirements
 
 F0 + F1: All F0 and F1 requirements remain satisfied. No major code improvements were made, as we were focusing more on finishing up the functionality. Good code is very important, but unfortunately meeting the software requirements is often a more pressing concern.
 
-F2.a: // Lo please fill out the answer here
+F2.a: The external DSL is based on JSON. Originally, we were going to use YAML, but it was easier to create the JSON file and access it instead of parsing a YAML file.
 
-External DSL Translation: // Lo please fill out this too
+```typescript
+  file.default.tutorial.weather_events.forEach((event) => {
+    if(event.time == TIME) { currWeather = event.weather; }
+    if(currWeather == "rain") { maxWaterAmount = event.maxAmount; maxSunAmount = file.default.tutorial.base_sun_amount; }
+    else if(currWeather == "heatwave") { maxSunAmount = event.maxAmount; maxWaterAmount = file.default.tutorial.base_water_amount; }
+  });
+```
+
+External DSL Translation: The above code accesses the events that were included in the JSON file. Based on the TIME variable the current event would change and certain variables would change as well depending on what the event is. For example, the rain event causes the maxiumum water level to be increased while the sun level returns to the default level that is defined in the JSON. This same idea carries over to the heatwave event.
 
 F2.b: The internal DSL is inspired by the code example given on the F2 slide. We have set it up as a long array of function calls, with a compiler function creating the functions that are being called. For example, the following function: 
 
+```typescript
 function sunflower($: plantDefinition)
     $.icon("🌻");
     $.desired("🥕");
@@ -108,6 +117,7 @@ function sunflower($: plantDefinition)
       if (index + 1 < GRID_LENGTH * GRID_WIDTH && grid[index + 1].plantLevel == null) return true;
       return false;
     });
+```
 
 Brackets have been removed as they were causing errors in this file. By calling .map() on the array of functions, we can then run each one through the compiler and pass in the aruguments given here. This allows us to turn all of this into an object that we can easily read from in the code! The host language used here is Typescript. Using an internal DSL like this allows us to change plants based on various values by using if statements and the like, thus controlling which exact function calls we do. This would, for example, allow us to randomly assign a Pea plant to be green and smooth, or yellow and wrinkly, without needing to mess with the rest of the code at large! But if I'm being honest, I think that just making it an object would have been better in this specific use case. We kept our gameplay rules pretty simple for this project.
 
@@ -117,7 +127,7 @@ We start with the .icon() call which sets up the type of plant to use, in this c
 
 And finally we have .growsWhen() which we took inspiration from the example for. Rather than determine specific circumstances in which the plant grows to the next stage, we have extra, more complicated scenarios that help the plant grow better. Match these up with the desired neighbors for super-fast growth! The contents of the function in .growsWhen() differ from plant to plant; for Sunflowers, it grows better when the neighboring cell to the east is empty. This means there's nothing blocking it from turning towards the sun when it rises, which is a classic trait of sunflowers.
 
-F2.c: Unfortunately we had to skip this step for our own sanity. With the deadline approaching and Victoria having further issues, changing the code to Phaser as planned or even simply to Javascript from Typescript quickly exceeded our available scope. 
+F2.c: Unfortunately we had to skip this step for our own sanity. With the deadline approaching, changing the code to Phaser as planned or even simply to Javascript from Typescript quickly exceeded our available scope. 
 
 Reflection
 --------------------------------------------
