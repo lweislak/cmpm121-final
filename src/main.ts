@@ -16,6 +16,7 @@ const PLANT_GROWTH_ICONS = ["🌱", "🌾"];
 let TIME = 0;
 
 let maxSunAmount = 3;
+let maxWaterAmount = 3;
 let currWeather = "neutral";
 
 const APP_NAME = "Farming Game";
@@ -149,6 +150,12 @@ function checkKeys(key: string) {
   TIME++;
   checkTurn();
   saveSnapshot();
+  console.log(TIME);
+  file.default.tutorial.weather_events.forEach((event) => {
+    if(event.time == TIME) { currWeather = event.weather; }
+    if(currWeather == "rain") { maxWaterAmount = event.maxAmount; maxSunAmount = file.default.tutorial.base_sun_amount; }
+    else if(currWeather == "heatwave") { maxSunAmount = event.maxAmount; maxWaterAmount = file.default.tutorial.base_water_amount; }
+  });
 }
 
 //Check if a turn has passed
@@ -156,8 +163,8 @@ function checkTurn() {
   if (TIME % TURN == 0) {
     for(let x = 0; x < (GRID_LENGTH * GRID_WIDTH); x++) {
         grid[x].waterLevel -= grid[x].sunLevel; //Sun level decreases water level each turn
-        grid[x].waterLevel += Math.round(Math.random() * 3);
-        grid[x].sunLevel = Math.round(Math.random() * 3);
+        grid[x].waterLevel += Math.round(Math.random() * maxWaterAmount);
+        grid[x].sunLevel = Math.round(Math.random() * maxSunAmount);
         if(grid[x].waterLevel <= 0) { //If water level gets too low, plant dies
           killPlant(grid[x]);
         }
@@ -240,10 +247,6 @@ function checkWin(): boolean {
     //if(element.amount < 5) { return false;}
   }
   return true;
-}
-
-function checkDrought() {
-
 }
 
 function updateInventory() {
