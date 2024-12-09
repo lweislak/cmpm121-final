@@ -104,7 +104,7 @@ F2.a: The external DSL is based on JSON. Originally, we were going to use YAML, 
   });
 ```
 
-External DSL Translation: The above code accesses the events that were included in the JSON file. Based on the TIME variable the events would change. For example, the rain event causes the maxiumum water level to be increased while the sun level returns to the default level that is defined in the JSON. This same idea carries over to the heatwave event as well.
+External DSL Translation: The above code accesses the events that were included in the JSON file. Based on the TIME variable the current event would change and certain variables would change as well depending on what the event is. For example, the rain event causes the maxiumum water level to be increased while the sun level returns to the default level that is defined in the JSON. This same idea carries over to the heatwave event.
 
 F2.b: The internal DSL is inspired by the code example given on the F2 slide. We have set it up as a long array of function calls, with a compiler function creating the functions that are being called. For example, the following function: 
 
