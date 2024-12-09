@@ -1,0 +1,29 @@
+{
+  "tutorial": {
+    "grid_size": [
+      6,
+      6
+    ],
+    "win_condition" : {
+        "potato" : 10,
+        "carrot" : 10,
+        "corn" : 10
+    },
+    "weather_events" : [
+      {
+        "time": 100,
+        "plantAmount": null,
+        "weather": "rain",
+        "maxAmount": 8
+      },
+      {
+        "time": 300,
+        "plantAmount": 5,
+        "weather": "heatwave",
+        "maxAmount": 10
+      }
+    ],
+    "base_sun_amount" : 3,
+    "base_water_amount" : 3
+  }
+}
