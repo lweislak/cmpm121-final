@@ -84,3 +84,41 @@ F1.d: Undo and redo functionality is present, similar to D2. The player can undo
 Reflection
 --------------------------------------------
 Victoria took a larger role for F1, working on the undo and redo stacks as well as the autosave and save functionalities and associated UI for F1.a, F1.c, and F1.d as well as half of F1.b. The total team effort ended up being split more 50/50, as she misunderstood F1.a and due to skipping F3 for health reasons, the saves were stored only during run time rather than being persistant. Lo thus ended up doing the majority of the work for F1.a and F1.b as a result. As Victoria has been falling behind, we have determined that she should be taking care of the devlogs and the video submissions.
+
+# Devlog 12/08/2024
+
+F2 complete!
+
+How we satisfied the software requirements
+--------------------------------------------
+
+F0 + F1: All F0 and F1 requirements remain satisfied. No major code improvements were made, as we were focusing more on finishing up the functionality. Good code is very important, but unfortunately meeting the software requirements is often a more pressing concern.
+
+F2.a: // Lo please fill out the answer here
+
+External DSL Translation: // Lo please fill out this too
+
+F2.b: The internal DSL is inspired by the code example given on the F2 slide. We have set it up as a long array of function calls, with a compiler function creating the functions that are being called. For example, the following function: 
+
+function sunflower($: plantDefinition)
+    $.icon("🌻");
+    $.desired("🥕");
+    $.button(null);
+    $.growsWhen((index: number) => {
+      if (index + 1 < GRID_LENGTH * GRID_WIDTH && grid[index + 1].plantLevel == null) return true;
+      return false;
+    });
+
+Brackets have been removed as they were causing errors in this file. By calling .map() on the array of functions, we can then run each one through the compiler and pass in the aruguments given here. This allows us to turn all of this into an object that we can easily read from in the code! The host language used here is Typescript. Using an internal DSL like this allows us to change plants based on various values by using if statements and the like, thus controlling which exact function calls we do. This would, for example, allow us to randomly assign a Pea plant to be green and smooth, or yellow and wrinkly, without needing to mess with the rest of the code at large! But if I'm being honest, I think that just making it an object would have been better in this specific use case. We kept our gameplay rules pretty simple for this project.
+
+External DSL Translation: In the above function sunflower(), we call it with the $: plantDefinition argument, which is the DSL language for the plants that we created. We'll call functions from the definiton, which are set up to be called by the DSL compiler.
+
+We start with the .icon() call which sets up the type of plant to use, in this case a sunflower emoji. This not only sets the display for the plant in it's harvestable stage, but also is used internally to determine the type of plant that is planted in a cell. We then move onto the .desired() call, which works simularly to determine the type of desired neighbor that makes this plant grow better. In keeping with previous F assignments, only cardinally adjacent neighbor cells are checked. Then we have .button(), which sets up an empty property to be filled out with a clickable button to plant the seeds with.
+
+And finally we have .growsWhen() which we took inspiration from the example for. Rather than determine specific circumstances in which the plant grows to the next stage, we have extra, more complicated scenarios that help the plant grow better. Match these up with the desired neighbors for super-fast growth! The contents of the function in .growsWhen() differ from plant to plant; for Sunflowers, it grows better when the neighboring cell to the east is empty. This means there's nothing blocking it from turning towards the sun when it rises, which is a classic trait of sunflowers.
+
+F2.c: Unfortunately we had to skip this step for our own sanity. With the deadline approaching and Victoria having further issues, changing the code to Phaser as planned or even simply to Javascript from Typescript quickly exceeded our available scope. 
+
+Reflection
+--------------------------------------------
+Our team plan has changed a lot with this assignment, with us being forced to begin to not attempt certain requirements. Both Lo and Victoria were struggling with burn out, and Victoria's difficulties from earlier were pressing down even more with other final projects being due for other classes. However, we still completed the vast majority of F2, and we are satisfied with our work. We are especially proud of this because F2 in particular ended up being surprisingly difficult compared to prior assignments.
