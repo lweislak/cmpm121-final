@@ -51,4 +51,25 @@ Reflection
 --------------------------------------------
 Our plan changed due to the software requirements of F1 and F2. Doing the project in Unity when both of us were rusty seemed like a losing proposition. We decided to switch to pure Typescript instead, as it will be easier to satisfy F2.c later on down the line, and it's been our primary programming language for this quarter. Lo satisfied most of the requirements for this stage of development, as Victoria was having difficulties with other classes and out-of-class events. Victoria's main contribution for this stage was in the design with the Design Document, and in F0.f and a little of F0.a.
 
-#Devlog Entry 12/08/2024
+# Devlog Entry 12/07/2024
+
+F1 complete!
+
+How we satisfied the software requirements
+--------------------------------------------
+F0.a: Same as last week.
+F0.b: Same as last week.
+F0.c: Same as last week.
+F0.d: Same as last week.
+F0.e: Same as last week.
+F0.f: Same as last week.
+F0.g: Same as last week.
+F1.a: The internal state of our games grid is stored in a single contiguous array in AoS format. It is an array that stores structures, in this case our Cell objects.
+F1.a.Diagram: ![F1.a Memory Allocation Diagram](./MemoryAllocation.png)
+F1.b: The player can manually save their progress in one of three save files, and load from each of them with six distinct buttons on the main page.
+F1.c: There is a secret fourth save file that functions as an autosave, saving whenever a turn occurs (after X actions) that is automatically restored.
+F1.d: Undo and redo functionality is present, similar to D2. The player can undo individual actions back to the beginning of play, which was actually somewhat tricky until we realized we needed to include the starting position of the board as well. The undoStack these game states are stored in are saved in the save files, enabling full undo functionality across saves. Undoing an action moves it to the redoStack, again similar to D2, and the player can redo their actions all the way up to the latest one. The redoStack is not saved across save states, as the redo history would be lost anyways when the player takes a diverging action other than undoing and redoing.
+
+Reflection
+--------------------------------------------
+Victoria took a larger role for F1, working on the undo and redo stacks as well as the autosave and save functionalities and associated UI for F1.a, F1.c, and F1.d as well as half of F1.b. The total team effort ended up being split more 50/50, as she misunderstood F1.a and due to skipping F3 for health reasons, the saves were stored only during run time rather than being persistant. Lo thus ended up doing the majority of the work for F1.a and F1.b as a result. As Victoria has been falling behind, we have determined that she should be taking care of the devlogs and the video submissions.
