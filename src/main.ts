@@ -36,17 +36,78 @@ canvas.width = CANVAS_WIDTH;
 gridDiv.append(canvas);
 
 //Create buttons for different seeds
-let seedTypes = [
-  {"icon": "🥔", "desired": "🌽", "button": null as HTMLButtonElement | null},
-  {"icon": "🥕", "desired": "🥔", "button": null as HTMLButtonElement | null},
-  {"icon": "🌽", "desired": "🥕", "button": null as HTMLButtonElement | null}
+// let seedTypes = [
+//   {"icon": "🥔", "desired": "🌽", "button": null as HTMLButtonElement | null},
+//   {"icon": "🥕", "desired": "🥔", "button": null as HTMLButtonElement | null},
+//   {"icon": "🌽", "desired": "🥕", "button": null as HTMLButtonElement | null}
+// ]
+
+interface plantDefinition {
+  icon(icon: string): void;
+  desired(desired: string): void;
+  button(button: HTMLButtonElement | null): void;
+  growsWhen(growsWhen: (index: number) => boolean): void
+}
+
+const allPlants = [
+  function corn($: plantDefinition) {
+    $.icon("🌽");
+    $.desired("🥕");
+    $.button(null);
+    $.growsWhen((index: number) => {
+      const neighbors = getNeighbors(index);
+      neighbors.forEach((neighborIndex) => {
+        if (grid[neighborIndex].plantType == "🌽") return true;
+      });
+      return false;
+    });
+  },
+  function carrot($: plantDefinition) {
+    $.icon("🥕");
+    $.desired("🥔");
+    $.button(null);
+    $.growsWhen((index: number) => {
+      const neighbors = getNeighbors(index);
+      let nearby: number = 0;
+      neighbors.forEach((neighborIndex) => {
+        if (grid[neighborIndex].plantLevel != null) nearby++;
+      });
+      if (nearby < 2) return true;
+      return false;
+    })
+  },
+  function potato($: plantDefinition) {
+    $.icon("🥔");
+    $.desired("🌽");
+    $.button(null);
+    $.growsWhen((index: number) => {
+      const neighbors = getNeighbors(index);
+      neighbors.forEach((neighborIndex) => {
+        if (grid[neighborIndex].plantType == "🌻") return false;
+      });
+      return true;
+    })
+  },
+  function sunflower($: plantDefinition) {
+    $.icon("🌻");
+    $.desired("🥕");
+    $.button(null);
+    $.growsWhen((index: number) => {
+      if (index + 1 < GRID_LENGTH * GRID_WIDTH && grid[index + 1].plantLevel == null) return true;
+      return false;
+    });
+  }
 ]
+
+//Create buttons for different seeds
+let seedTypes = allPlants.map(compilePlants);
 
 //Create player inventory
 let inventory = [
   {"icon": "🥔", "amount": 0 as number},
   {"icon": "🥕", "amount": 0 as number},
-  {"icon": "🌽", "amount": 0 as number}
+  {"icon": "🌽", "amount": 0 as number},
+  {"icon": "🌻", "amount": 0 as number}
 ]
 
 interface Player {
@@ -201,6 +262,45 @@ function checkNeighbors(index: number) {
   }
 }
 
+function getNeighbors(index: number) {
+  const cellsToCheck = [
+    index - 1, //left
+    index + 1, //right
+    index - GRID_LENGTH, //up
+    index + GRID_LENGTH //down
+  ];
+  const results: number[] = [];
+  cellsToCheck.forEach((neighborIndex) => {
+    if (neighborIndex >= 0 && (neighborIndex < GRID_LENGTH * GRID_WIDTH)) {
+      results.push(neighborIndex);
+    }
+  })
+  return results;
+}
+
+function compilePlants(action: ($: plantDefinition) => void) {
+  let nthIcon: string = "";
+  let nthDesired: string = "";
+  let nthGrowsWhen;
+  const nthButton: HTMLButtonElement | null = document.createElement("button");
+  const dsl: plantDefinition = {
+    icon(x: string): void {
+       nthIcon = x;
+    },
+    desired(x: string) {
+      nthDesired = x;
+    },
+    growsWhen(x: (index: number) => boolean): void {
+      nthGrowsWhen = x;
+    },
+    button(x: HTMLButtonElement | null): void {
+      void(x);
+    }
+  };
+  action(dsl);
+  return {"icon": nthIcon, "desired": nthDesired, "button": nthButton, "grow": nthGrowsWhen};
+}
+
 
 function killPlant(cell: Cell) {
   cell.plantIcon = null;
@@ -225,6 +325,7 @@ function reap(cell: Cell) {
       obj.amount++;
       updateInventory();
     }
+    console.log(obj.icon, obj.amount, inventory.length);
   }
   killPlant(cell);
   if(checkWin()) { console.log("YOU WIN"); }
@@ -249,9 +350,10 @@ function setButtons() {
   for(const seed of seedTypes) {
     if(!seed.button) {
       seed.button = document.createElement("button");
-      seed.button.innerText = seed.icon;
-      buttonDiv.append(seed.button!);
     }
+    seed.button.innerText = seed.icon;
+    buttonDiv.append(seed.button!);
+    
     seed.button!.addEventListener("click", function() {
       player.currentSeed = seed.icon;
     });
@@ -430,6 +532,7 @@ for(const element of inventory) {
   const txt = document.createTextNode(`${element.icon!}: ${element.amount.toString()}\n`);
   inventoryDiv.appendChild(txt);
   //inventoryDiv.append(document.createElement('br'));
+  console.log(element.icon, element.amount, inventory.length);
 }
 
 drawGrid();
