@@ -58,16 +58,27 @@ F1 complete!
 How we satisfied the software requirements
 --------------------------------------------
 F0.a: Same as last week.
+
 F0.b: Same as last week.
+
 F0.c: Same as last week.
+
 F0.d: Same as last week.
+
 F0.e: Same as last week.
+
 F0.f: Same as last week.
+
 F0.g: Same as last week.
+
 F1.a: The internal state of our games grid is stored in a single contiguous array in AoS format. It is an array that stores structures, in this case our Cell objects.
+
 F1.a.Diagram: ![F1.a Memory Allocation Diagram](./MemoryAllocation.png)
+
 F1.b: The player can manually save their progress in one of three save files, and load from each of them with six distinct buttons on the main page.
+
 F1.c: There is a secret fourth save file that functions as an autosave, saving whenever a turn occurs (after X actions) that is automatically restored.
+
 F1.d: Undo and redo functionality is present, similar to D2. The player can undo individual actions back to the beginning of play, which was actually somewhat tricky until we realized we needed to include the starting position of the board as well. The undoStack these game states are stored in are saved in the save files, enabling full undo functionality across saves. Undoing an action moves it to the redoStack, again similar to D2, and the player can redo their actions all the way up to the latest one. The redoStack is not saved across save states, as the redo history would be lost anyways when the player takes a diverging action other than undoing and redoing.
 
 Reflection
