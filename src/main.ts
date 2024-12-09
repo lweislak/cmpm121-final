@@ -211,7 +211,6 @@ function checkKeys(key: string) {
   TIME++;
   checkTurn();
   saveSnapshot();
-  console.log(TIME);
   file.default.tutorial.weather_events.forEach((event) => {
     if(event.time == TIME) { currWeather = event.weather; }
     if(currWeather == "rain") { maxWaterAmount = event.maxAmount; maxSunAmount = file.default.tutorial.base_sun_amount; }
@@ -335,7 +334,6 @@ function reap(cell: Cell) {
       obj.amount++;
       updateInventory();
     }
-    console.log(obj.icon, obj.amount, inventory.length);
   }
   killPlant(cell);
   if(checkWin()) { console.log("YOU WIN"); }
@@ -539,7 +537,6 @@ for(const element of inventory) {
   const txt = document.createTextNode(`${element.icon!}: ${element.amount.toString()}\n`);
   inventoryDiv.appendChild(txt);
   //inventoryDiv.append(document.createElement('br'));
-  console.log(element.icon, element.amount, inventory.length);
 }
 
 drawGrid();
