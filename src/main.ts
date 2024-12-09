@@ -1,4 +1,5 @@
 import "./style.css";
+import * as file from "./externalDSL.json" with { type: "json" };
 
 const PADDING = 0;
 const CANVAS_WIDTH = 600;
@@ -7,13 +8,15 @@ const DRAW_OFFSET_X = 25;
 const DRAW_OFFSET_Y = 60;
 const BOX_SIZE = 100;
 
-const GRID_LENGTH = 6;
-const GRID_WIDTH = 6;
+const GRID_LENGTH = file.default.tutorial.grid_size[0];
+const GRID_WIDTH = file.default.tutorial.grid_size[1];
 const TURN = 15;
 const MAX_PLANT_LEVEL = 3;
 const PLANT_GROWTH_ICONS = ["🌱", "🌾"];
 let TIME = 0;
 
+let maxSunAmount = 3;
+let currWeather = "neutral";
 
 const APP_NAME = "Farming Game";
 const app = document.querySelector<HTMLDivElement>("#app")!;
@@ -44,9 +47,9 @@ let seedTypes = [
 
 //Create player inventory
 let inventory = [
-  {"icon": "🥔", "amount": 0 as number},
-  {"icon": "🥕", "amount": 0 as number},
-  {"icon": "🌽", "amount": 0 as number}
+  {"name" : "potato" as string, "icon": "🥔", "amount": 0 as number},
+  {"name" : "carrot" as string, "icon": "🥕", "amount": 0 as number},
+  {"name" : "corn" as string, "icon": "🌽", "amount": 0 as number}
 ]
 
 interface Player {
@@ -154,7 +157,7 @@ function checkTurn() {
     for(let x = 0; x < (GRID_LENGTH * GRID_WIDTH); x++) {
         grid[x].waterLevel -= grid[x].sunLevel; //Sun level decreases water level each turn
         grid[x].waterLevel += Math.round(Math.random() * 3);
-        grid[x].sunLevel = Math.round(Math.random() * 5);
+        grid[x].sunLevel = Math.round(Math.random() * 3);
         if(grid[x].waterLevel <= 0) { //If water level gets too low, plant dies
           killPlant(grid[x]);
         }
@@ -232,9 +235,15 @@ function reap(cell: Cell) {
 
 function checkWin(): boolean {
   for(const element of inventory) {
-    if(element.amount < 5) { return false;}
+    // @ts-ignore -- Access json object with string as index
+    if (element.amount < file.default.tutorial.win_condition[element.name]) { return false;}
+    //if(element.amount < 5) { return false;}
   }
   return true;
+}
+
+function checkDrought() {
+
 }
 
 function updateInventory() {
@@ -271,11 +280,6 @@ function setButtons() {
       player.currentSeed = snapshot!.seed;
       for(let x = 0; x < (CANVAS_HEIGHT * CANVAS_WIDTH) / BOX_SIZE; x++) {
           grid[x] = snapshot!.savedGrid[x];
-          // grid[i][j].plantIcon = snapshot!.savedGrid[i][j].plantIcon;
-          // grid[i][j].sunLevel = snapshot!.savedGrid[i][j].sunLevel;
-          // grid[i][j].waterLevel = snapshot!.savedGrid[i][j].waterLevel;
-          // grid[i][j].plantType = snapshot!.savedGrid[i][j].plantType;
-          // grid[i][j].plantLevel = snapshot!.savedGrid[i][j].plantLevel;
       }
       redoStack.push(snapshot!);
       drawGrid();
@@ -416,7 +420,7 @@ addEventListener("keydown", (e) => {
 //Populate grid with cells
 for(let x = 0; x < (GRID_LENGTH * GRID_WIDTH); x++) {
     const cell: Cell = {
-      sunLevel: Math.round(Math.random() * 5),
+      sunLevel: Math.round(Math.random() * 3),
       waterLevel: 0,
       plantIcon: null,
       plantLevel: null,

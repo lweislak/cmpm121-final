@@ -1,0 +1,13 @@
+{
+  "tutorial": {
+    "grid_size": [
+      6,
+      6
+    ],
+    "win_condition" : {
+        "potato" : 10,
+        "carrot" : 10,
+        "corn" : 10
+    }
+  }
+}
