@@ -1,0 +1,11 @@
+{
+  "name": "Farm Game",
+  "short_name": "FarmGame",
+  "description": "PWA of CMPM121 F3.",
+  "start_url": "/index.html",
+  "display": "fullscreen",
+  "icons": [{
+    "sizes": "180x180",
+    "src": "https://cdn.glitch.global/4fc6eda5-1313-4a1e-8b76-b859653416cd/brace-logo-symbol.png?v=1733533998031"
+  }]
+}
