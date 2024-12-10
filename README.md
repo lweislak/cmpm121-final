@@ -1,3 +1,19 @@
+# Chill Farmin'
+
+Controls
+--------------------------------------------
+
+Arrow keys to move. E button to water, reap, and sow plants.
+Use mouse to select onscreen buttons to select which plant you're planting, save and load the game, and undo / redo actions.
+
+Rules
+--------------------------------------------
+
+Plants grow once they have enough sunlight and plenty of water.
+Get plants to their final stage to reap them. Grow enough of each fully grown plant to win!
+
+Positioning of plants matter. Each plant has one other that it likes to grow next to, and certain conditions it grows better in. These are both stackable, test out various combinations and see what makes each plant grow fastest!
+
 # Devlog Entry - 11/20/24
 
 Introducing the Team
@@ -132,29 +148,3 @@ F2.c: Unfortunately we had to skip this step for our own sanity. With the deadli
 Reflection
 --------------------------------------------
 Our team plan has changed a lot with this assignment, with us being forced to begin to not attempt certain requirements. Both Lo and Victoria were struggling with burn out, and Victoria's difficulties from earlier were pressing down even more with other final projects being due for other classes. However, we still completed the vast majority of F2, and we are satisfied with our work. We are especially proud of this because F2 in particular ended up being surprisingly difficult compared to prior assignments.
-
-# Devlog 12/09/2024
-
-F3 complete!
-
-How we satisfied the software requirements
---------------------------------------------
-
-F0 + F1 + F2: All requirements continue to be met.  Some bits of code that got changed were for loops. Lo is used to coding in C++, so the code originally had much of the typical for(i = 0; i < something; i++). In later versions this switched to the example code below.
-```typescript
-for(const element of inventory) {
-  const txt = document.createTextNode(`${element.icon!}: ${element.amount.toString()}\n`);
-  inventoryDiv.appendChild(txt);
-}
-```
-It's not a huge change, but this seems more elegant.
-
-F3.a + F3.b: We did not finish these requirements. An attempt was made to follow this tutorial: https://medium.com/ms-club-of-sliit/internationalization-using-i18next-with-react-typescript-d7c443df3be4
-This would have utilized the i18next framework to detect different languages.
-
-F3.c + F3.d: We had trouble deploying the code to a working webpage (see Lo's countless 3am attempts to get github pages to deploy and display properly) so there is no way to install the game on mobile. However, the index.html and webmanifest files would work correctly if there was an accessable webpage on mobile. The proccess to download and play offline is the same for a computer, which is what we currently have avaliable.
-We used the provided link: https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Guides/Making_PWAs_installable
-
-Reflection
---------------------------------------------
-Because we worked on this project so late, there was little time to implement many of the F3 requirements or change the design. We had plans to go back and refactor the code, but unfortunately much of that had to be cut in the interest of time. In the last stretch before the due date the goal becomes to get things working and try to clean up as you go. The individual roles were cast aside and we would work on whatever we thought we could get done. I'm tired -Lo, 5:30am
